@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zpredict - Your Academic Journey Starts Here</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/homestyle.css' %}">
+</head>
+<body>
+    <!-- Animated background particles -->
+    <div class="bg-particles" id="particles"></div>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="{% url 'home' %}" class="logo"> <span class="feature-icon">
+                <img src="{% static 'img/graduate.png' %}" alt="Smart Predictions Icon"></span>Zpredict</a>
+            <div class="nav-links">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="{% url 'register' %}">Register</a>
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'chat' %}">Chatbot</a>
+                <a href="{% url 'prediction' %}">University Predictions</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Your Dream University Awaits</h1>
+            <p class="hero-subtitle">
+                Discover your perfect academic match with AI-powered predictions based on your Z-score and aspirations
+            </p>
+        </div>
+
+        <div class="features">
+            <div class="feature-card" onclick="navigateTo(`{% url 'prediction' %}`)">               
+                <span class="feature-icon">
+                    <img src="{% static 'img/predict.png' %}" alt="Smart Predictions Icon">
+                </span>
+                <h3>University Predictions</h3>
+                <p>Get personalized university recommendations based on your academic performance and preferences</p>
+            </div>
+
+            <div class="feature-card" onclick="navigateTo(`{% url 'chat' %}`)">
+                <span class="feature-icon">
+                    <img src="{% static 'img/chatbot.png' %}" alt="AI Chatbot Icon">
+                </span>
+                <h3>AI Chatbot</h3>
+                <p>Ask questions about universities, courses, and admission requirements through our intelligent assistant</p>
+            </div>
+
+            <div class="feature-card" onclick="navigateTo(`{% url 'register' %}`)">
+                <span class="feature-icon">
+                    <img src="{% static 'img/career.png' %}" alt="Career Progress Icon">
+                </span>
+                <h3>Career Predictions</h3>
+                <p>Get a career prediction based on your academic performance and preferences</p>
+            </div>
+        </div>
+
+        <div class="cta-section">
+            <button class="cta-button" onclick="navigateTo(`{% url 'chat' %}`)">
+                <span>🚀</span>
+                Start Your Journey
+            </button>
+        </div>
+    </section>
+
+    <!-- Fallback navigateTo if not in homescript.js -->
+    <script>
+        if (typeof navigateTo === 'undefined') {
+            function navigateTo(url) {
+                window.location.href = url;
+            }
+        }
+    </script>
+
+    <script src="{% static 'js/homescript.js' %}"></script>
+</body>
+</html>

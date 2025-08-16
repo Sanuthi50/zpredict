@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register Admin - University Guidance System</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+    }
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 18px;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #34495e;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #bdc3c7;
+      border-radius: 6px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    button:disabled {
+      background-color: #95a5a6;
+      cursor: not-allowed;
+    }
+    .alert {
+      padding: 12px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      color: white;
+    }
+    .error {
+      background-color: #e74c3c;
+    }
+    .success {
+      background-color: #2ecc71;
+    }
+    .login-link {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+      color: #7f8c8d;
+    }
+    .login-link a {
+      color: #3498db;
+      text-decoration: none;
+    }
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>🔐 Admin Registration</h2>
+
+    <!-- Message Display (will be replaced by JS) -->
+    <div id="message"></div>
+
+    <form id="registerForm">
+      <!-- No csrf_token needed for API calls -->
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="admin@university.lk" required />
+      </div>
+
+      <div class="form-group">
+        <label for="first_name">First Name</label>
+        <input type="text" id="first_name" name="first_name" placeholder="John" required />
+      </div>
+
+      <div class="form-group">
+        <label for="last_name">Last Name</label>
+        <input type="text" id="last_name" name="last_name" placeholder="Doe" required />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="••••••••" required />
+      </div>
+
+      <div class="form-group">
+        <label for="confirm_password">Confirm Password</label>
+        <input type="password" id="confirm_password" name="confirm_password" placeholder="••••••••" required />
+      </div>
+
+      <button type="submit" id="submitBtn">Register Admin</button>
+    </form>
+
+    <div class="login-link">
+      Already have an account? <a href='http://127.0.0.1:8000/admin-dashboard/'>Login here</a>
+    </div>
+  </div>
+
+  <script>
+    // Base URL - Update if needed
+    const API_BASE_URL = 'http://127.0.0.1:8000'; // Change to your backend domain if different
+
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+      e.preventDefault(); // Prevent default form submission
+
+      const email = document.getElementById('email').value.trim();
+      const first_name = document.getElementById('first_name').value.trim();
+      const last_name = document.getElementById('last_name').value.trim();
+      const password = document.getElementById('password').value;
+      const confirm_password = document.getElementById('confirm_password').value;
+
+      const messageDiv = document.getElementById('message');
+      const submitBtn = document.getElementById('submitBtn');
+
+      // Clear previous messages
+      messageDiv.innerHTML = '';
+
+      // Client-side validation
+      if (password !== confirm_password) {
+        showMessage('Passwords do not match.', 'error');
+        return;
+      }
+
+      if (password.length < 6) {
+        showMessage('Password must be at least 6 characters.', 'error');
+        return;
+      }
+
+      // Disable button during request
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Registering...';
+
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/admin/register/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: email,
+            first_name: first_name,
+            last_name: last_name,
+            password: password,
+            confirm_password: confirm_password  
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          showMessage('Registration successful! Redirecting to login...', 'success');
+          // Optionally clear form
+          setTimeout(() => { window.location.href = "http://127.0.0.1:8000/admin-dashboard/"; }, 1500);
+        } else {
+          // Try to get JSON error
+          let errorMessage = 'Registration failed.';
+          try {
+            const errorData = await response.json();
+            const errorKeys = Object.keys(errorData);
+            if (errorKeys.includes('email')) {
+              errorMessage = 'Email: ' + errorData.email.join(', ');
+            } else if (errorKeys.includes('non_field_errors')) {
+              errorMessage = errorData.non_field_errors.join(', ');
+            } else {
+              errorMessage = Object.values(errorData)[0];
+            }
+          } catch (e) {
+            // Fallback: if response is not JSON
+            const errorText = await response.text();
+            console.warn("Server error (non-JSON):", errorText);
+            errorMessage = 'Server error. Check console.';
+          }
+          showMessage(errorMessage, 'error');
+        }
+      } catch (error) {
+        console.error('Network or server error:', error);
+        showMessage('Unable to connect to server. Is it running?', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Register Admin';
+      }
+    });
+
+    // Utility to show messages
+    function showMessage(text, type) {
+      const messageDiv = document.getElementById('message');
+      const alert = document.createElement('div');
+      alert.className = `alert ${type}`;
+      alert.textContent = text;
+      messageDiv.innerHTML = '';
+      messageDiv.appendChild(alert);
+
+      setTimeout(() => {
+        if (alert.parentElement) {
+          alert.remove();
+        }
+      }, 5000);
+    }
+  </script>
+
+</body>
+</html>

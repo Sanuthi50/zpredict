@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+</head>
+<body>
+    <h2>Ask Your Question</h2>
+    <textarea id="question" rows="4" cols="50"></textarea><br><br>
+    <button id="sendBtn">Send</button>
+
+    <h3>Answer:</h3>
+    <div id="answer"></div>
+
+    <script>
+        document.getElementById('sendBtn').addEventListener('click', async function() {
+            const question = document.getElementById('question').value;
+            const token = localStorage.getItem('access_token');
+
+            if (!token) {
+                alert("You must log in first!");
+                window.location.href = "login.html";
+                return;
+            }
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/chat/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ question: question })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('answer').innerText = data.answer;
+                } else {
+                    document.getElementById('answer').innerText = "❌ " + (data.detail || "Error");
+                }
+            } catch (err) {
+                document.getElementById('answer').innerText = "❌ Error: " + err.message;
+            }
+        });
+    </script>
+</body>
+</html>

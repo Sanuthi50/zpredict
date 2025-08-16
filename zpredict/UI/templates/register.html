@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join the Vibe ✨</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/registerstyle.css' %}">
+</head>
+<body>
+    <div class="particles">
+        <div class="particle" style="left: 20%; animation-duration: 6s;"></div>
+        <div class="particle" style="left: 40%; animation-duration: 8s;"></div>
+        <div class="particle" style="left: 60%; animation-duration: 7s;"></div>
+        <div class="particle" style="left: 80%; animation-duration: 9s;"></div>
+    </div>
+    
+    <div class="main-container">
+               
+        <div class="header">
+            <h1 class="title">Join the Vibe</h1>
+            <p class="subtitle">Level up your experience ✨</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <form id="registerForm">
+            <div class="form-group">
+                <div class="input-container">
+                    <div class="input-icon">👤</div>
+                    <input type="text" id="first_name" class="form-input" placeholder="First Name" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="input-container">
+                    <div class="input-icon">👥</div>
+                    <input type="text" id="last_name" class="form-input" placeholder="Last Name" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="input-container">
+                    <div class="input-icon">📧</div>
+                    <input type="email" id="email" class="form-input" placeholder="Email Address" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="input-container">
+                    <div class="input-icon">🔒</div>
+                    <input type="password" id="password" class="form-input" placeholder="Create Password" required>
+                </div>
+            </div>
+            
+            <button type="submit" class="submit-btn" id="submitBtn">
+                Start Your Journey 🚀
+            </button>
+        </form>
+        
+        <div class="status" id="status"></div>
+    </div>
+
+    <script src="{% static 'js/registerscript.js' %}"></script>
+       
+</body>
+</html>
