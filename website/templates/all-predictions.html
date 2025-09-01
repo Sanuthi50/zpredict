@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Predictions - Zpredict</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{% static 'css/allpredictions.css' %}" rel="stylesheet">
+</head>
+<body>
+    <!-- Animated background particles -->
+    <div class="bg-particles" id="particles"></div>
+    
+    <!-- Include Navbar Component -->
+    {% include 'navbar.html' %}
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">My Predictions</h1>
+            <p class="page-subtitle">View and manage your saved university predictions</p>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <div class="search-box">
+                <img src="{% static 'images/search (1).png' %}" alt="Search" class="search-icon">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search predictions...">
+            </div>
+            <div class="filter-controls">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="recommended">Recommended</button>
+                <button class="filter-btn" data-filter="high-probability">High Probability</button>
+                <button class="filter-btn" data-filter="recent">Recent</button>
+            </div>
+        </div>
+
+        <!-- Predictions List -->
+        <div class="predictions-list" id="predictionsList">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading predictions...</p>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination">
+            <!-- Pagination will be added dynamically -->
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span id="toastMessage"></span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/auth-utils.js' %}"></script>
+    <script src="{% static 'js/allpredictions.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>University Admission Predictor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/predictstyle.css' %}">
+</head>
+<body>
+  {% include 'navbar.html' %}
+
+  <div class="particles" id="particles"></div>
+
+  <div class="container">
+    <div class="header">
+      <h1>University Admission Predictor</h1>
+      <p>Advanced analytics for your university admission prospects</p>
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div class="fun-fact" id="funFact">Begin by entering your details to receive personalized predictions</div>
+    </div>
+
+    <div id="input-form">
+      <div class="chat-container">
+        <div class="chat-section">
+          <div class="section-title">Academic Information</div>
+          <div class="form-group">
+            <label>Academic Year</label>
+            <div class="input-wrapper">
+              <input type="number" id="year" value="2024" min="2000" max="2030">
+              <span class="validation-icon" id="yearIcon"></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Z-Score</label>
+            <div class="input-wrapper">
+              <input type="number" id="z_score" step="0.001" min="0" max="3" placeholder="0.000 - 3.000">
+              <span class="validation-icon" id="zScoreIcon"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-section">
+          <div class="section-title">Academic Background</div>
+          <div class="form-group">
+            <label>Field of Study</label>
+            <div class="input-wrapper">
+              <select id="stream">
+                <option value="">Select your field of study</option>
+                <option value="Physical Science">Physical Science</option>
+                <option value="Biological Science">Biological Science</option>
+                <option value="Commerce">Commerce</option>
+                <option value="Arts">Arts</option>
+                <option value="Engineering Technology">Engineering Technology</option>
+                <option value="Biosystems Technology">Biosystems Technology</option>
+                <option value="Other">Other</option>
+              </select>
+              <span class="validation-icon" id="streamIcon"></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>District</label>
+            <div class="input-wrapper">
+              <select id="district">
+                <option value="">Select your district</option>
+                <option value="COLOMBO">Colombo</option>
+                <option value="GAMPAHA">Gampaha</option>
+                <option value="KALUTARA">Kalutara</option>
+                <option value="KANDY">Kandy</option>
+                <option value="MATALE">Matale</option>
+                <option value="NUWARA ELIYA">Nuwara Eliya</option>
+                <option value="GALLE">Galle</option>
+                <option value="MATARA">Matara</option>
+                <option value="HAMBANTOTA">Hambantota</option>
+                <option value="JAFFNA">Jaffna</option>
+                <option value="KILINOCHCHI">Kilinochchi</option>
+                <option value="MANNAR">Mannar</option>
+                <option value="VAVUNIYA">Vavuniya</option>
+                <option value="MULLAITIVU">Mullaitivu</option>
+                <option value="BATTICALOA">Batticaloa</option>
+                <option value="AMPARA">Ampara</option>
+                <option value="TRINCOMALEE">Trincomalee</option>
+                <option value="KURUNEGALA">Kurunegala</option>
+                <option value="PUTTALAM">Puttalam</option>
+                <option value="ANURADHAPURA">Anuradhapura</option>
+                <option value="POLONNARUWA">Polonnaruwa</option>
+                <option value="BADULLA">Badulla</option>
+                <option value="MONERAGALA">Moneragala</option>
+                <option value="RATNAPURA">Ratnapura</option>
+                <option value="KEGALLE">Kegalle</option>
+              </select>
+              <span class="validation-icon" id="districtIcon"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="button-container">
+          <button id="predict-btn" class="btn">
+            <span id="btn-text">Generate Predictions</span>
+          </button>
+        </div>
+      </div>
+      <div id="loading-message" class="message info hidden">
+        <span class="loading-spinner"></span>
+        <span>Processing your data. This may take a moment.</span>
+      </div>
+      <div id="error-message" class="message error hidden"></div>
+      <div id="success-message" class="message success hidden"></div>
+    </div>
+
+    <div id="predictions-section" class="hidden">
+      <div class="results-container">
+        <div class="section-title" style="font-size: 2rem; margin-bottom: 20px;">
+          Admission Predictions
+        </div>
+        <div id="session-info" class="message info"></div>
+        <div class="stats-grid" id="prediction-stats">
+          <div class="stat-card">
+            <div class="stat-value" id="total-predictions">0</div>
+            <div class="stat-label">Total Matches</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="highly-recommended-count">0</div>
+            <div class="stat-label">High Probability</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="recommended-count">0</div>
+            <div class="stat-label">Good Matches</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="avg-probability">0%</div>
+            <div class="stat-label">Average Success Rate</div>
+          </div>
+        </div>
+      </div>
+      <div class="results-container">
+        <div class="controls">
+          <div class="control-row">
+            <button id="view-courses-btn" class="btn-secondary">View by Courses</button>
+            <button id="view-universities-btn" class="btn-secondary">View by Universities</button>
+            <button id="select-all-btn" class="btn-secondary">Select All</button>
+            <button id="select-none-btn" class="btn-secondary">Clear All</button>
+            <button id="select-recommended-btn" class="btn-secondary">Select Best Matches</button>
+          </div>
+          <div class="filter-row">
+            <input type="text" id="search-filter" placeholder="Search universities or courses...">
+            <select id="course-filter">
+              <option value="">All Courses</option>
+            </select>
+            <select id="university-filter">
+              <option value="">All Universities</option>
+            </select>
+            <select id="recommendation-filter">
+              <option value="">All Recommendations</option>
+              <option value="High Chance">High Chance</option>
+              <option value="Moderate Chance">Moderate Chance</option>
+              <option value="Low Chance">Low Chance</option>
+              <option value="Very Low Chance">Very Low Chance</option>
+            </select>
+          </div>
+          <div class="pagination-controls">
+            <select id="items-per-page">
+              <option value="5">5 per page</option>
+              <option value="10" selected>10 per page</option>
+              <option value="20">20 per page</option>
+              <option value="50">50 per page</option>
+            </select>
+            <span id="pagination-info">Showing 1-10 of 0 predictions</span>
+            <button id="prev-page-btn" class="btn-secondary">Previous</button>
+            <span id="page-info">Page 1 of 1</span>
+            <button id="next-page-btn" class="btn-secondary">Next</button>
+          </div>
+        </div>
+        <div class="table-container">
+          <table id="predictions-table">
+            <thead>
+              <tr>
+                <th>Select</th>
+                <th>University</th>
+                <th>Course</th>
+                <th>Cutoff Score</th>
+                <th>Admission Probability</th>
+                <th>Recommendation</th>
+                <th>Confidence</th>
+                <th>Aptitude Test</th>
+                <th>Merit Only</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div style="margin-top: 25px; text-align: center;">
+          <button id="save-selected-btn" class="btn">
+            Save Selected Options
+          </button>
+          <button id="view-saved-btn" class="btn-secondary" style="margin-left: 15px;">
+            View Saved Predictions
+          </button>
+          <span id="selection-count" class="message info" style="margin-left: 15px; display: inline-block;">0 predictions selected</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="saved-predictions-section" class="results-container hidden">
+      <div class="section-title">
+        Saved Predictions
+      </div>
+      <div class="controls">
+        <input type="text" id="saved-search-filter" placeholder="Search saved predictions...">
+        <select id="saved-course-filter">
+          <option value="">All Courses</option>
+        </select>
+        <select id="saved-university-filter">
+          <option value="">All Universities</option>
+        </select>
+        <button id="clear-saved-filters-btn" class="btn-secondary">Clear Filters</button>
+      </div>
+      <div class="table-container">
+        <table id="saved-predictions-table">
+          <thead>
+            <tr>
+              <th>University</th>
+              <th>Course</th>
+              <th>Cutoff Score</th>
+              <th>Admission Probability</th>
+              <th>Recommendation</th>
+              <th>Saved Date</th>
+              <th>Notes</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div id="saved-pagination-controls" class="pagination-controls">
+        <button id="saved-prev-btn" class="btn-secondary">Previous</button>
+        <span id="saved-page-info">Page 1 of 1</span>
+        <button id="saved-next-btn" class="btn-secondary">Next</button>
+      </div>
+    </div>
+
+    <div id="history-section" class="results-container hidden">
+      <div class="section-title">
+        Prediction History
+      </div>
+      <div id="history-content">
+        <ul id="history-list" class="history-list"></ul>
+      </div>
+    </div>
+  </div>
+  <script src="{% static 'js/predictscript.js' %}"></script>
+  </body>
+</html>

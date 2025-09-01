@@ -8,30 +8,41 @@ class DashboardManager {
     }
 
     init() {
-        this.checkAuthentication();
-        this.loadDashboardData();
+        const isAuthed = this.checkAuthentication();
+        if (isAuthed) {
+            this.loadDashboardData();
+        } else {
+            this.showAlert('Please login to view your dashboard.', 'info');
+        }
         this.setupEventListeners();
     }
 
     checkAuthentication() {
         if (!this.token) {
-            this.redirectToLogin();
-            return;
+            // Do not hard-redirect; allow page to render with prompt
+            return false;
         }
 
         // Update user name in navigation
-        if (this.userInfo.first_name) {
-            document.getElementById('userName').textContent = `${this.userInfo.first_name} ${this.userInfo.last_name}`;
+        const userNameEl = document.getElementById('userName');
+        if (this.userInfo.first_name && userNameEl) {
+            userNameEl.textContent = `${this.userInfo.first_name} ${this.userInfo.last_name}`;
         }
+        return true;
     }
 
     async loadDashboardData() {
+        if (!this.token) return;
         try {
             const response = await this.makeAuthenticatedRequest('student/dashboard/');
             if (response.ok) {
                 const data = await response.json();
                 this.updateDashboard(data);
             } else {
+                if (response.status === 401) {
+                    this.showAlert('Session expired. Please login again.', 'warning');
+                    return;
+                }
                 throw new Error('Failed to load dashboard data');
             }
         } catch (error) {
@@ -41,21 +52,33 @@ class DashboardManager {
     }
 
     updateDashboard(data) {
-        // Update statistics
-        document.getElementById('totalSessions').textContent = data.statistics.total_sessions;
-        document.getElementById('totalSaved').textContent = data.statistics.total_saved_predictions;
-        document.getElementById('totalChats').textContent = data.statistics.total_chats;
-        document.getElementById('totalFeedbacks').textContent = data.statistics.total_feedbacks;
+        // Safely update statistics with null checks
+        const stats = data.statistics || {};
+        
+        const totalSessionsEl = document.getElementById('totalSessions');
+        const totalSavedEl = document.getElementById('totalSaved');
+        const totalChatsEl = document.getElementById('totalChats');
+        const totalFeedbacksEl = document.getElementById('totalFeedbacks');
+        
+        if (totalSessionsEl) totalSessionsEl.textContent = stats.total_sessions || 0;
+        if (totalSavedEl) totalSavedEl.textContent = stats.total_saved_predictions || 0;
+        if (totalChatsEl) totalChatsEl.textContent = stats.total_chats || 0;
+        if (totalFeedbacksEl) totalFeedbacksEl.textContent = stats.total_feedbacks || 0;
 
         // Update recent sessions
-        this.updateRecentSessions(data.recent_sessions);
+        this.updateRecentSessions(data.recent_sessions || []);
         
         // Update recent saved predictions
-        this.updateRecentSaved(data.recent_saved_predictions);
+        this.updateRecentSaved(data.recent_saved_predictions || []);
     }
 
     updateRecentSessions(sessions) {
         const container = document.getElementById('recentSessions');
+        
+        if (!container) {
+            console.warn('recentSessions element not found');
+            return;
+        }
         
         if (!sessions || sessions.length === 0) {
             container.innerHTML = `
@@ -91,10 +114,15 @@ class DashboardManager {
         container.innerHTML = sessionsHtml;
     }
 
-    updateRecentSaved(predictions) {
+    updateRecentSaved(savedPredictions) {
         const container = document.getElementById('recentSaved');
         
-        if (!predictions || predictions.length === 0) {
+        if (!container) {
+            console.warn('recentSaved element not found');
+            return;
+        }
+        
+        if (!savedPredictions || savedPredictions.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
                     <i class="fas fa-bookmark"></i>
@@ -105,7 +133,7 @@ class DashboardManager {
             return;
         }
 
-        const predictionsHtml = predictions.map(prediction => `
+        const predictionsHtml = savedPredictions.map(prediction => `
             <div class="activity-item d-flex align-items-center">
                 <div class="activity-icon bg-success">
                     <i class="fas fa-university"></i>

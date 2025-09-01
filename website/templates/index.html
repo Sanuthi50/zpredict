@@ -1,0 +1,129 @@
+{% load static %}
+<!DOCTYPE html>
+<!-- WEBSITE HOME TEMPLATE -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zpredict Website - Your Academic Journey Starts Here</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="{% static 'css/indexstyle.css' %}" rel="stylesheet">
+</head>
+<body>
+  <!-- Animated background particles -->
+  <div class="bg-particles" id="particles"></div>
+  
+  <!-- Include Navbar Component -->
+  {% include 'navbar.html' %}
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Your Dream University Awaits</h1>
+      <p class="hero-subtitle">
+        Discover your perfect academic match with AI-powered predictions based on your Z-score and aspirations.
+      </p>
+      
+      <!-- Image placeholder for hero section -->
+      <div class="image-placeholder">
+       <img src="{% static 'images/grad.jpg' %}" alt="Hero Illustration"/>
+      </div>
+    </div>
+    <div class="features">
+      <div class="feature-card" onclick="navigateTo('http://127.0.0.1:8000/website/predict/')">
+        <h3>University Predictions</h3>
+        <p>Get personalized university recommendations based on your academic performance and preferences.</p>
+        
+        <!-- Image placeholder for feature -->
+        <div class="image-placeholder">
+          <img src="{% static 'images/university.png' %}" alt="University Illustration"/>
+        </div>
+      </div>
+      <div class="feature-card" onclick="navigateTo('http://127.0.0.1:8000/website/chat/')">
+        <h3>AI Chatbot</h3>
+        <p>Ask questions about universities, courses, and admission requirements through our intelligent assistant.</p>
+        
+        <!-- Image placeholder for feature -->
+        <div class="image-placeholder">
+          <img src="{% static 'images/chatbot.png' %}" alt="Chatbot Illustration"/>
+        </div>
+      </div>
+      <div class="feature-card" onclick="navigateTo('http://127.0.0.1:8000/website/recommendation/')">
+        <h3>Career Predictions</h3>
+        <p>Get a career prediction based on your academic performance and preferences.</p>
+        
+        <!-- Image placeholder for feature -->
+        <div class="image-placeholder">
+         <img src="{% static 'images/career.png' %}" alt="Career Illustration"/>
+        </div>
+      </div>
+    </div>
+    <div class="cta-section">
+      <button class="cta-button" onclick="navigateTo('http://127.0.0.1:8000/chat/')">Start Your Journey</button>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="about-section">
+    <div class="container">
+      <h2>About Zpredict</h2>
+      
+      <!-- Image placeholder for about section -->
+      <div class="image-placeholder">
+        <img src="{% static 'images/aboutus.avif' %}" alt="About Illustration"/>
+      </div>
+      
+      <p>
+        Zpredict is your personalized academic guide, built for Sri Lankan students.  
+        We combine AI, machine learning, and official UGC datasets to help you make smarter choices  
+        about your university and career path. From predicting cutoff marks to suggesting careers aligned  
+        with your strengths, we are here to make your higher education journey less stressful and more empowering.
+      </p>     
+      <p>
+        Whether you are unsure about which university program suits you best or need clarity on aptitude tests,  
+        our platform provides insights, recommendations, and chatbot support.We  
+        built Zpredict to give you the tools we wish we had.
+      </p>
+    </div>
+  </section>
+
+  <!-- Feedback Section -->
+  <section id="feedback" class="feedback-section">
+    <div class="container">
+      <h2>We Value Your Feedback</h2>
+      <p>Tell us how we are doing and how we can improve Zpredict for you.</p>
+      
+      <form id="feedbackForm">
+        <div class="form-group">
+          <label for="feedbackText">Your Feedback</label>
+          <textarea id="feedbackText" name="feedback" rows="4" placeholder="Type your thoughts here..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="rating">Rate Us</label>
+          <select id="rating" name="rating">
+            <option value="5">Excellent</option>
+            <option value="4">Good</option>
+            <option value="3">Average</option>
+            <option value="2">Poor</option>
+            <option value="1">Very Poor</option>
+          </select>
+        </div>
+
+        <button type="submit" class="cta-button">Submit Feedback</button>
+      </form>
+
+      <div class="recent-feedbacks" id="recentFeedbacksWrapper">
+        <h3 class="recent-title">Recent Feedbacks</h3>
+        <div id="recentFeedbacks">
+          <div class="empty-state">No feedbacks yet. Be the first to share!</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</script>
+  <script src="{% static 'js/indexscript.js' %}"></script>
+</body>
+</html>

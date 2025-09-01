@@ -1,0 +1,418 @@
+/* Modern Gen Z/Gamified Login Styles */
+:root {
+    --primary: #6C63FF;
+    --primary-dark: #564FD8;
+    --secondary: #FF6B8B;
+    --accent: #36D6C3;
+    --dark: #1A1A2E;
+    --light: #FFFFFF;
+    --gray: #F5F5F7;
+    --gray-dark: #6C757D;
+    --success: #00C9A7;
+    --warning: #FFC75F;
+    --danger: #FF8066;
+    --gradient-primary: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    --gradient-accent: linear-gradient(135deg, var(--secondary), var(--accent));
+    --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 10px 15px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 20px 25px rgba(0, 0, 0, 0.15);
+    --radius: 12px;
+    --radius-lg: 20px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--gray);
+    color: var(--dark);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Particle Background Animation */
+.particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.particle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: float 15s infinite linear;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0) translateX(0) rotate(0deg);
+    }
+    100% {
+        transform: translateY(-100vh) translateX(100px) rotate(360deg);
+    }
+}
+
+/* Main Container with Gaming Vibes */
+.main-container {
+    background: var(--light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    width: 90%;
+    max-width: 450px;
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    z-index: 2;
+}
+
+.main-container::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    background: var(--gray);
+    border-radius: var(--radius-lg);
+    z-index: -1;
+    animation: border-pulse 3s infinite alternate;
+}
+
+@keyframes border-pulse {
+    0% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.main-container:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+/* Header Section */
+.header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 800;
+    color: var(--dark);
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    letter-spacing: -0.5px;
+}
+
+.subtitle {
+    color: var(--gray-dark);
+    font-size: 1.1rem;
+    font-weight: 500;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+/* Progress Bar */
+.progress-bar {
+    height: 8px;
+    background-color: var(--gray);
+    border-radius: 4px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--gradient-primary);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+/* Form Elements */
+.form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    z-index: 1;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.input-icon img {
+    width: 100%;
+    height: auto;
+    transition: all 0.3s ease;
+}
+
+.form-input {
+    width: 100%;
+    padding: 15px 15px 15px 50px;
+    border: 2px solid var(--gray);
+    border-radius: var(--radius);
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: var(--gray);
+    font-weight: 500;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+    background-color: var(--light);
+    transform: translateY(-2px);
+}
+
+.form-input:focus + .input-icon {
+    transform: scale(1.1);
+}
+
+.form-input:focus + .input-icon img {
+    filter: invert(33%) sepia(91%) saturate(1553%) hue-rotate(229deg) brightness(95%) contrast(93%);
+}
+
+/* Submit Button with Gaming Style */
+.submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--gradient-primary);
+    color: var(--light);
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 5px 15px rgba(212, 210, 250, 0.3);
+    margin-bottom: 1.5rem;
+}
+
+.submit-btn:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(108, 99, 255, 0.4);
+}
+
+.submit-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 3px 10px rgba(108, 99, 255, 0.3);
+}
+
+.submit-btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: 0.5s;
+}
+
+.submit-btn:hover::after {
+    left: 100%;
+}
+
+/* Login Prompt */
+.login-prompt {
+    text-align: center;
+    color: var(--gray-dark);
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+}
+
+.login-link {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.login-link:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+/* Status Messages */
+.status {
+    margin-top: 1.5rem;
+    padding: 12px;
+    border-radius: var(--radius);
+    text-align: center;
+    font-weight: 600;
+    display: none;
+    animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.status.success {
+    background-color: rgba(0, 201, 167, 0.1);
+    color: var(--success);
+    display: block;
+    border-left: 4px solid var(--success);
+}
+
+.status.error {
+    background-color: rgba(255, 128, 102, 0.1);
+    color: var(--danger);
+    display: block;
+    border-left: 4px solid var(--danger);
+}
+
+/* XP Progress Bar */
+.xp-progress {
+    margin-top: 1.5rem;
+    background: var(--gray);
+    border-radius: 20px;
+    height: 8px;
+    overflow: hidden;
+    position: relative;
+}
+
+.xp-progress-bar {
+    height: 100%;
+    width: 65%;
+    background: var(--gradient-primary);
+    border-radius: 20px;
+    transition: width 0.5s ease;
+    position: relative;
+}
+
+.xp-progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.xp-text {
+    font-size: 0.8rem;
+    color: var(--gray-dark);
+    text-align: center;
+    margin-top: 0.5rem;
+    font-weight: 600;
+}
+
+/* Level Indicator */
+.level-indicator {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: var(--gradient-primary);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    box-shadow: var(--shadow-md);
+    border: 2px solid white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-container {
+        width: 95%;
+        padding: 2rem 1.5rem;
+    }
+    
+    .title {
+        font-size: 2rem;
+    }
+    
+    .level-indicator {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-container {
+        padding: 1.5rem 1.25rem;
+    }
+    
+    .title {
+        font-size: 1.75rem;
+    }
+    
+    .form-input {
+        padding: 12px 12px 12px 45px;
+    }
+    
+    .submit-btn {
+        padding: 14px;
+        font-size: 1rem;
+    }
+}

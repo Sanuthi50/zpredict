@@ -115,15 +115,24 @@ def ask_question(self, student_id, question):
                 # Prevent overloading Gemini
                 context = context[:5000]
 
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        if context:
-            prompt = f"Context (UGC Handbook):\n{context}\n\nQuestion: {question}"
-        else:
-            prompt = f"Answer this question using reliable online sources:\n\n{question}"
-            source = "Gemini Online"
+        try:
+            model = genai.GenerativeModel("gemini-1.5-flash")
+            if context:
+                prompt = f"Context (UGC Handbook):\n{context}\n\nQuestion: {question}"
+            else:
+                prompt = f"Answer this question using reliable online sources:\n\n{question}"
+                source = "Gemini Online"
 
-        response = model.generate_content(prompt)
-        answer = response.text if response else "No response from Gemini."
+            response = model.generate_content(prompt)
+            answer = response.text if response else "No response from Gemini."
+        except Exception as e:
+            error_msg = str(e)
+            if "10054" in error_msg or "forcibly closed" in error_msg.lower():
+                logger.warning(f"Gemini API network error in task: {error_msg}")
+                answer = "I'm experiencing network connectivity issues. Please try again in a moment."
+            else:
+                logger.error(f"Gemini API error in task: {error_msg}")
+                answer = "I'm unable to process your request at the moment. Please try again later."
 
         # Save chat history
         ChatHistory.objects.create(

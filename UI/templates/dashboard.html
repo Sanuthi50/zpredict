@@ -1,0 +1,334 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Zpredict</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{% static 'css/admindashboard.css' %}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Animated background particles -->
+    <div class="bg-particles" id="particles"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="/" class="logo">
+                    Zpredict <span class="status-dot"></span>
+                </a>
+            </div>
+            
+            <div class="nav-menu" id="navMenu">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="/admin-dashboard/" class="nav-link active">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/feedback-management/" class="nav-link">Feedback</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin-reprocess/" class="nav-link">Reprocess</a>
+                    </li>
+                </ul>
+                
+                <div class="nav-auth">
+                    <div class="user-menu">
+                        <span class="user-info">
+                            <i class="fas fa-user-shield"></i>
+                            <span id="adminName">Admin</span>
+                        </span>
+                        <button class="btn btn-outline" id="logoutBtn">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Admin Dashboard</h1>
+            <p class="page-subtitle">Comprehensive overview of system statistics, user activity, and analytics</p>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number" id="totalStudents">0</h3>
+                    <p class="stat-label">Total Students</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number" id="totalAdmins">0</h3>
+                    <p class="stat-label">Total Admins</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number" id="totalPredictions">0</h3>
+                    <p class="stat-label">Total Predictions</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number" id="totalCareerRecommendations">0</h3>
+                    <p class="stat-label">Career Recommendations</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number" id="totalChats">0</h3>
+                    <p class="stat-label">Total Chats</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-comment-dots"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number" id="totalFeedbacks">0</h3>
+                    <p class="stat-label">Total Feedbacks</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Model Health Section -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2>Model Health Status</h2>
+                <button class="refresh-btn" id="refreshModelHealth">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+            <div class="model-health-grid" id="modelHealthGrid">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading model health...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Section -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2>Analytics & Insights</h2>
+                <div class="chart-controls">
+                    <button class="chart-btn active" data-chart="predictions">Predictions</button>
+                    <button class="chart-btn" data-chart="careers">Careers</button>
+                    <button class="chart-btn" data-chart="users">Users</button>
+                </div>
+            </div>
+            
+            <div class="analytics-grid">
+                <!-- Chart Container -->
+                <div class="chart-container">
+                    <canvas id="analyticsChart"></canvas>
+                </div>
+                
+                <!-- Analytics Summary -->
+                <div class="analytics-summary" id="analyticsSummary">
+                    <div class="summary-card">
+                        <h3>Top Universities</h3>
+                        <div class="summary-list" id="topUniversities">
+                            <div class="loading">Loading...</div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <h3>Popular Courses</h3>
+                        <div class="summary-list" id="popularCourses">
+                            <div class="loading">Loading...</div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <h3>Top Careers</h3>
+                        <div class="summary-list" id="topCareers">
+                            <div class="loading">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Management Section -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2>Feedback Management</h2>
+                <div class="feedback-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="feedbackSearch" placeholder="Search feedback...">
+                    </div>
+                    <select id="feedbackFilter">
+                        <option value="all">All Ratings</option>
+                        <option value="5">5 Stars</option>
+                        <option value="4">4 Stars</option>
+                        <option value="3">3 Stars</option>
+                        <option value="2">2 Stars</option>
+                        <option value="1">1 Star</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="feedback-list" id="feedbackList">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading feedback...</p>
+                </div>
+            </div>
+            
+            <!-- Feedback Pagination -->
+            <div class="pagination" id="feedbackPagination">
+                <!-- Pagination will be added dynamically -->
+            </div>
+        </div>
+
+        <!-- Recent Activity Section -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2>Recent Activity</h2>
+            </div>
+            
+            <div class="activity-grid">
+                <!-- Recent Predictions -->
+                <div class="activity-card">
+                    <div class="activity-header">
+                        <h3><i class="fas fa-chart-line"></i> Recent Predictions</h3>
+                    </div>
+                    <div class="activity-content" id="recentPredictions">
+                        <div class="loading">Loading...</div>
+                    </div>
+                </div>
+                
+                <!-- Recent Career Recommendations -->
+                <div class="activity-card">
+                    <div class="activity-header">
+                        <h3><i class="fas fa-rocket"></i> Recent Career Recommendations</h3>
+                    </div>
+                    <div class="activity-content" id="recentCareers">
+                        <div class="loading">Loading...</div>
+                    </div>
+                </div>
+                
+                <!-- Recent Users -->
+                <div class="activity-card">
+                    <div class="activity-header">
+                        <h3><i class="fas fa-user-plus"></i> Recent Users</h3>
+                    </div>
+                    <div class="activity-content" id="recentUsers">
+                        <div class="loading">Loading...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Confirm Action</h3>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="modalMessage">Are you sure you want to proceed?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="modalCancel">Cancel</button>
+                <button class="btn btn-danger" id="modalConfirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span id="toastMessage"></span>
+    </div>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>Checking authentication...</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/admindashboard.js' %}"></script>
+    
+    <style>
+    .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.95);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        backdrop-filter: blur(5px);
+    }
+    
+    .loading-content {
+        text-align: center;
+        color: #2c3e50;
+    }
+    
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #6c63ff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .main-container {
+        display: none;
+    }
+    
+    .main-container.authenticated {
+        display: block;
+    }
+    </style>
+</body>
+</html>

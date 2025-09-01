@@ -207,36 +207,36 @@ class SavedPrediction(models.Model):
 
 
 # =============================
-# Legacy Prediction Model (for backward compatibility)
+# Legacy Prediction Model (DEPRECATED - Use PredictionSession instead)
 # =============================
-class Prediction(models.Model):
-    CONFIDENCE_LEVELS = [
-        ('low', 'Low'),
-        ('medium', 'Medium'),
-        ('high', 'High'),
-    ]
+# class Prediction(models.Model):
+#     CONFIDENCE_LEVELS = [
+#         ('low', 'Low'),
+#         ('medium', 'Medium'),
+#         ('high', 'High'),
+#     ]
 
-    student = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        limit_choices_to={'user_type': 'student'}
-    )
-    stream = models.CharField(max_length=100, default='')
-    year = models.IntegerField(default=2024)
-    z_score = models.FloatField(default=0.0)
-    confidence_level = models.CharField(max_length=10, choices=CONFIDENCE_LEVELS, default='medium')
-    predicted_at = models.DateTimeField(auto_now_add=True)
-    active = models.BooleanField(default=True)
+#     student = models.ForeignKey(
+#         User,
+#         on_delete=models.CASCADE,
+#         limit_choices_to={'user_type': 'student'}
+#     )
+#     stream = models.CharField(max_length=100, default='')
+#     year = models.IntegerField(default=2024)
+#     z_score = models.FloatField(default=0.0)
+#     confidence_level = models.CharField(max_length=10, choices=CONFIDENCE_LEVELS, default='medium')
+#     predicted_at = models.DateTimeField(auto_now_add=True)
+#     active = models.BooleanField(default=True)
 
-    class Meta:
-        ordering = ['-predicted_at']
+#     class Meta:
+#         ordering = ['-predicted_at']
 
-    def clean(self):
-        if self.year < 1900 or self.year > 2100:
-            raise ValidationError('Year must be between 1900 and 2100')
+#     def clean(self):
+#         if self.year < 1900 or self.year > 2100:
+#             raise ValidationError('Year must be between 1900 and 2100')
 
-    def __str__(self):
-        return f"{self.stream} - {self.year} ({self.student.email})"
+#     def __str__(self):
+#         return f"{self.stream} - {self.year} ({self.student.email})"
 
 
 # =============================
@@ -338,3 +338,63 @@ class Feedback(models.Model):
 
     def __str__(self):
         return f"Feedback from {self.student.email} - {self.submitted_at}"
+
+# =============================
+# Career Session Model
+# =============================
+class CareerSession(models.Model):
+    student = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        limit_choices_to={'user_type': 'student'},
+        related_name='career_sessions'
+    )
+    degree_program = models.CharField(max_length=200, default='', help_text="The degree program used for career prediction")
+    created_at = models.DateTimeField(auto_now_add=True)
+    num_career_predictions = models.IntegerField(default=0)
+    active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Career Session by {self.student.email} - {self.created_at}"
+
+
+# =============================
+# Saved Career Prediction Model
+# =============================
+class SavedCareerPrediction(models.Model):
+    student = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        limit_choices_to={'user_type': 'student'},
+        related_name='saved_career_predictions'
+    )
+    session = models.ForeignKey(
+        CareerSession,
+        on_delete=models.CASCADE,
+        related_name='saved_predictions'
+    )
+
+    career_title = models.CharField(max_length=200, default='')
+    career_code = models.CharField(max_length=20, default='', help_text="SOC/O*NET code")
+    match_score = models.FloatField(default=0.0, help_text="Match score between 0 and 1")
+    recommended_level = models.CharField(max_length=50, default='Recommended')
+    saved_at = models.DateTimeField(auto_now_add=True)
+    notes = models.TextField(blank=True, default='')
+
+    class Meta:
+        ordering = ['-saved_at']
+        unique_together = ['student', 'session', 'career_code']
+
+    def clean(self):
+        if not (0 <= self.match_score <= 1):
+            raise ValidationError('Match score must be between 0 and 1')
+
+    def __str__(self):
+        return f"{self.career_title} ({self.career_code}) - {self.student.email}"
+
+    @property
+    def match_percentage(self):
+        return self.match_score * 100

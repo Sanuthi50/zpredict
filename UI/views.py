@@ -14,37 +14,22 @@ import logging
 # Set up logging
 logger = logging.getLogger(__name__)
 
-class LoginView(TemplateView):
-    template_name = 'login.html'
-
-class RegisterView(View):
-    def get(self, request):
-        return render(request, 'register.html')
-
-class HomeView(View):
-    def get(self, request):
-        return render(request, 'home.html')
-
-class ChatView(View):
-    def get(self, request):
-        return render(request, 'chatbot.html')
 
 class AdminView(View):
     def get(self, request):
-        return render(request, 'admin-dashboard.html')
+        return render(request, 'dashboard.html')
 
 class AdminRegisterView(View):
     def get(self, request):
         return render(request, 'admin-register.html')
+class AdminLoginView(View): 
+    def get (self, request):
+        return render(request, 'admin-dashboard.html')
 
 class AdminReprocessView(View):
     def get(self, request):
         logger.info("=== AdminReprocessView: Starting token validation ===")
         
-        # Since frontend stores tokens in localStorage and sends via Authorization header,
-        # we need to handle both cases: direct access and API access
-        
-        # Check for token in Authorization header (from AJAX requests)
         auth_header = request.META.get('HTTP_AUTHORIZATION')
         logger.info(f"Authorization header: {auth_header}")
         
@@ -130,46 +115,10 @@ class AdminReprocessView(View):
             import traceback
             logger.error(f"Full traceback: {traceback.format_exc()}")
             return redirect('admin-dashboard')
-
-class PredictionView(View):
-    def get(self, request):
-        return render(request, 'prediction.html')
-
-class CareerPredictionView(View):
-    def get(self, request):
-        return render(request, 'career_prediction.html')
-
-# =============================
-# Student Dashboard Views
-# =============================
-
-class StudentDashboardView(View):
-    def get(self, request):
-        return render(request, 'student-dashboard.html')
-
-class StudentProfileView(View):
-    def get(self, request):
-        return render(request, 'student-profile.html')
-
-# =============================
-# Feedback System Views
-# =============================
-
-class FeedbackView(View):
-    def get(self, request):
-        return render(request, 'feedback.html')
-
 class FeedbackManagementView(View):
     def get(self, request):
         return render(request, 'feedback-management.html')
 
-# =============================
-# Enhanced Admin Views
-# =============================
-
-class EnhancedAdminDashboardView(View):
-    def get(self, request):
-        return render(request, 'enhanced-admin-dashboard.html')
 
 
 

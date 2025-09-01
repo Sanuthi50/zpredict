@@ -18,7 +18,10 @@ class CareerPredictor:
         self.tfidf_vectorizer = None
         self.model_path = os.path.join(settings.BASE_DIR, 'api','careermodel')
         self.models_loaded = False
-        self.load_models()
+        self._loading_lock = False  # Simple flag to prevent concurrent loading
+        
+        # Don't load models immediately - use lazy loading instead
+        logger.info(f"CareerPredictor initialized with lazy loading. Models will be loaded on first use.")
     
     def load_models(self) -> None:
         """Load trained models and encoders with improved error handling"""
@@ -96,12 +99,39 @@ class CareerPredictor:
             except Exception as e:
                 logger.error(f"Error loading tfidf_vectorizer: {str(e)}")
                 self.tfidf_vectorizer = None
+    def _ensure_models_loaded(self) -> bool:
+        """Ensure models are loaded using lazy loading pattern"""
+        if self.models_loaded:
+            return True
+            
+        # Prevent concurrent loading attempts
+        if self._loading_lock:
+            logger.info("Career models are currently being loaded by another thread, waiting...")
+            import time
+            for _ in range(30):  # Wait up to 3 seconds
+                time.sleep(0.1)
+                if self.models_loaded:
+                    return True
+            logger.warning("Timeout waiting for career models to load")
+            return False
+            
+        try:
+            self._loading_lock = True
+            logger.info("Loading career models on-demand...")
+            self.load_models()
+            
+            if self.models_loaded:
+                logger.info("Career models loaded successfully via lazy loading")
+            else:
+                logger.error("Failed to load career models")
+            return self.models_loaded
+            
+        finally:
+            self._loading_lock = False
+    
     def _validate_models_loaded(self) -> bool:
         """Check if models are properly loaded"""
-        if not self.models_loaded:
-            logger.error("Models not properly loaded. Please check model files.")
-            return False
-        return True
+        return self._ensure_models_loaded()
 
 def recommend_careers_logic(degree_program, hybrid_df, occupation_tfidf_matrix, tfidf_vectorizer, occupation_df, N=30, weight_similarity=0.6, weight_vacancies=0.4):
     """
@@ -197,10 +227,18 @@ def recommend_careers_logic(degree_program, hybrid_df, occupation_tfidf_matrix, 
     # Return the top recommendations (e.g., top 10)
     return recommended_careers[:10]
 
-# Create a single, globally-loaded instance of the predictor
-try:
-    career_predictor_instance = CareerPredictor()
-    logger.info("Career Predictor instance created successfully")
-except Exception as e:
-    logger.error(f"Failed to create Career Predictor instance: {str(e)}")
-    career_predictor_instance = None
+# Global variable to hold the lazy-loaded career predictor instance
+career_predictor_instance = None
+
+def get_career_predictor():
+    """Get career predictor instance using lazy loading pattern"""
+    global career_predictor_instance
+    if career_predictor_instance is None:
+        try:
+            logger.info("Creating Career Predictor instance with lazy loading...")
+            career_predictor_instance = CareerPredictor()
+            logger.info("Career Predictor instance created successfully")
+        except Exception as e:
+            logger.error(f"Failed to create Career Predictor instance: {str(e)}")
+            career_predictor_instance = None
+    return career_predictor_instance
