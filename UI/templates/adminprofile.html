@@ -1,0 +1,820 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>Admin Profile - ZPredict</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        .profile-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .profile-nav {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .nav-btn.active:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+        
+        .profile-content {
+            display: none;
+        }
+        
+        .profile-content.active {
+            display: block;
+        }
+        
+        .profile-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+        }
+        
+        .profile-info {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            align-items: start;
+        }
+        
+        .profile-avatar {
+            text-align: center;
+        }
+        
+        .avatar-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            margin: 0 auto 20px;
+        }
+        
+        .profile-details h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .detail-value {
+            color: #333;
+        }
+        
+        .edit-form {
+            display: none;
+        }
+        
+        .edit-form.active {
+            display: block;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+        
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .danger-zone {
+            background: #fff5f5;
+            border: 2px solid #fed7d7;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .danger-zone h4 {
+            color: #c53030;
+            margin-bottom: 15px;
+        }
+        
+        .danger-zone p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            color: #333;
+            margin: 0;
+        }
+        
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #000;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .alert-error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading i {
+            font-size: 24px;
+            color: #667eea;
+        }
+        
+        @media (max-width: 768px) {
+            .profile-info {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-particles"></div>
+    {% include 'navbar.html' %}
+
+    <div class="profile-container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div>
+                <h1 style="color: white; margin: 0;">Admin Profile</h1>
+                <p style="color: rgba(255, 255, 255, 0.8); margin: 5px 0 0 0;">Manage your admin account</p>
+            </div>
+            <button id="backToDashboard" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i>
+                Back to Dashboard
+            </button>
+        </div>
+
+        <!-- Profile Navigation -->
+        <div class="profile-nav">
+            <button class="nav-btn active" data-tab="profile">
+                <i class="fas fa-user"></i>
+                Profile Information
+            </button>
+            <button class="nav-btn" data-tab="security">
+                <i class="fas fa-shield-alt"></i>
+                Security Settings
+            </button>
+        </div>
+
+        <!-- Profile Information Tab -->
+        <div id="profile-tab" class="profile-content active">
+            <div class="profile-card">
+                <div class="profile-info">
+                    <div class="profile-avatar">
+                        <div class="avatar-large">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <button id="editProfileBtn" class="btn btn-outline">
+                            <i class="fas fa-edit"></i>
+                            Edit Profile
+                        </button>
+                    </div>
+                    
+                    <div class="profile-details">
+                        <h3>Profile Information</h3>
+                        <div id="profileDisplay">
+                            <div class="detail-item">
+                                <span class="detail-label">First Name:</span>
+                                <span class="detail-value" id="displayFirstName">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Last Name:</span>
+                                <span class="detail-value" id="displayLastName">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Email:</span>
+                                <span class="detail-value" id="displayEmail">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">User Type:</span>
+                                <span class="detail-value" id="displayUserType">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Account Status:</span>
+                                <span class="detail-value" id="displayStatus">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Date Joined:</span>
+                                <span class="detail-value" id="displayDateJoined">-</span>
+                            </div>
+                        </div>
+                        
+                        <div id="profileEdit" class="edit-form">
+                            <form id="editProfileForm">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="editFirstName">First Name</label>
+                                        <input type="text" id="editFirstName" name="first_name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editLastName">Last Name</label>
+                                        <input type="text" id="editLastName" name="last_name" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="editEmail">Email</label>
+                                    <input type="email" id="editEmail" name="email" required>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i>
+                                        Save Changes
+                                    </button>
+                                    <button type="button" id="cancelEditBtn" class="btn btn-secondary">
+                                        <i class="fas fa-times"></i>
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Settings Tab -->
+        <div id="security-tab" class="profile-content">
+            <div class="profile-card">
+                <h3>Security Settings</h3>
+                
+                <!-- Change Password Section -->
+                <div style="margin-bottom: 30px;">
+                    <h4>Change Password</h4>
+                    <form id="changePasswordForm">
+                        <div class="form-group">
+                            <label for="currentPassword">Current Password</label>
+                            <input type="password" id="currentPassword" name="old_password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">New Password</label>
+                            <input type="password" id="newPassword" name="new_password" required minlength="8">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm New Password</label>
+                            <input type="password" id="confirmPassword" name="confirm_password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-key"></i>
+                            Change Password
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Danger Zone -->
+                <div class="danger-zone">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Danger Zone</h4>
+                    <p>Once you delete your account, you will not be able to access the admin panel. This action can be reversed by another admin.</p>
+                    <button id="deleteAccountBtn" class="btn btn-danger">
+                        <i class="fas fa-user-times"></i>
+                        Delete Account
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Messages -->
+        <div id="alertContainer"></div>
+        
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Processing...</p>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Confirm Action</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p id="modalMessage">Are you sure you want to perform this action?</p>
+            </div>
+            <div class="modal-footer">
+                <button id="confirmBtn" class="btn btn-danger">Confirm</button>
+                <button id="cancelBtn" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/auth-utils.js' %}"></script>
+    <script>
+        // CSRF token setup
+        function getCSRFToken() {
+            return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
+                   getCookie('csrftoken');
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Admin Profile Management
+        class AdminProfileManager {
+            constructor() {
+                this.currentAdmin = null;
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.loadAdminProfile();
+            }
+
+            setupEventListeners() {
+                // Navigation tabs
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.switchTab(e.target.dataset.tab);
+                    });
+                });
+
+                // Profile editing
+                document.getElementById('editProfileBtn').addEventListener('click', () => {
+                    this.toggleEditMode(true);
+                });
+
+                document.getElementById('cancelEditBtn').addEventListener('click', () => {
+                    this.toggleEditMode(false);
+                });
+
+                document.getElementById('editProfileForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.updateProfile();
+                });
+
+                // Password change
+                document.getElementById('changePasswordForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.changePassword();
+                });
+
+                // Account deletion
+                document.getElementById('deleteAccountBtn').addEventListener('click', () => {
+                    this.showDeleteModal();
+                });
+
+                // Back to dashboard
+                document.getElementById('backToDashboard').addEventListener('click', () => {
+                    window.location.href = '/admin-dashboard/';
+                });
+
+                // Modal events
+                document.querySelector('.close').addEventListener('click', () => {
+                    this.hideModal();
+                });
+
+                document.getElementById('cancelBtn').addEventListener('click', () => {
+                    this.hideModal();
+                });
+
+                // Close modal when clicking outside
+                window.addEventListener('click', (e) => {
+                    const modal = document.getElementById('confirmModal');
+                    if (e.target === modal) {
+                        this.hideModal();
+                    }
+                });
+            }
+
+            switchTab(tabName) {
+                // Update navigation buttons
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+                // Update content
+                document.querySelectorAll('.profile-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(`${tabName}-tab`).classList.add('active');
+            }
+
+            async loadAdminProfile() {
+                try {
+                    this.showLoading(true);
+                    
+                    if (!isAuthenticated()) {
+                        this.showAlert('Please log in to view your profile.', 'error');
+                        window.location.href = '/login/';
+                        return;
+                    }
+
+                    const response = await authenticatedFetch('/api/users/profile/', {
+                        method: 'GET'
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.currentAdmin = data;
+                        this.displayProfile(data);
+                    } else if (response.status === 401) {
+                        this.showAlert('Session expired. Please log in again.', 'error');
+                        clearAuthTokens();
+                        window.location.href = '/login/';
+                    } else {
+                        const error = await response.json();
+                        this.showAlert(error.detail || 'Failed to load profile', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error loading profile:', error);
+                    this.showAlert('Failed to load profile. Please try again.', 'error');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            displayProfile(admin) {
+                document.getElementById('displayFirstName').textContent = admin.first_name || '-';
+                document.getElementById('displayLastName').textContent = admin.last_name || '-';
+                document.getElementById('displayEmail').textContent = admin.email || '-';
+                document.getElementById('displayUserType').textContent = admin.user_type || '-';
+                document.getElementById('displayStatus').textContent = admin.active ? 'Active' : 'Inactive';
+                document.getElementById('displayDateJoined').textContent = admin.date_joined ? 
+                    new Date(admin.date_joined).toLocaleDateString() : '-';
+
+                // Populate edit form
+                document.getElementById('editFirstName').value = admin.first_name || '';
+                document.getElementById('editLastName').value = admin.last_name || '';
+                document.getElementById('editEmail').value = admin.email || '';
+            }
+
+            toggleEditMode(show) {
+                const display = document.getElementById('profileDisplay');
+                const edit = document.getElementById('profileEdit');
+                
+                if (show) {
+                    display.style.display = 'none';
+                    edit.classList.add('active');
+                } else {
+                    display.style.display = 'block';
+                    edit.classList.remove('active');
+                }
+            }
+
+            async updateProfile() {
+                try {
+                    this.showLoading(true);
+                    
+                    const formData = new FormData(document.getElementById('editProfileForm'));
+                    const data = Object.fromEntries(formData.entries());
+
+                    const response = await authenticatedFetch('/api/users/update_profile/', {
+                        method: 'PUT',
+                        body: JSON.stringify(data)
+                    });
+
+                    if (response.ok) {
+                        const updatedData = await response.json();
+                        // Handle different response structures
+                        const userData = updatedData.user || updatedData;
+                        this.currentAdmin = userData;
+                        this.displayProfile(userData);
+                        this.toggleEditMode(false);
+                        this.showAlert('Profile updated successfully!', 'success');
+                    } else {
+                        const error = await response.json();
+                        this.showAlert(error.detail || 'Failed to update profile', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error updating profile:', error);
+                    this.showAlert('Failed to update profile. Please try again.', 'error');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            async changePassword() {
+                try {
+                    this.showLoading(true);
+                    
+                    const formData = new FormData(document.getElementById('changePasswordForm'));
+                    const data = Object.fromEntries(formData.entries());
+
+                    // Validate password confirmation
+                    if (data.new_password !== data.confirm_password) {
+                        this.showAlert('New passwords do not match.', 'error');
+                        return;
+                    }
+
+                    // Send only required fields to API
+                    const passwordData = {
+                        old_password: data.old_password,
+                        new_password: data.new_password
+                    };
+
+                    const response = await authenticatedFetch('/api/users/change_password/', {
+                        method: 'POST',
+                        body: JSON.stringify(passwordData)
+                    });
+
+                    if (response.ok) {
+                        this.showAlert('Password changed successfully!', 'success');
+                        document.getElementById('changePasswordForm').reset();
+                    } else {
+                        const error = await response.json();
+                        this.showAlert(error.detail || 'Failed to change password', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error changing password:', error);
+                    this.showAlert('Failed to change password. Please try again.', 'error');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            showDeleteModal() {
+                document.getElementById('modalTitle').textContent = 'Delete Account';
+                document.getElementById('modalMessage').textContent = 
+                    'Are you sure you want to delete your admin account? You will not be able to access the admin panel until another admin reactivates your account. This action preserves your data.';
+                document.getElementById('confirmBtn').textContent = 'Delete Account';
+                document.getElementById('confirmBtn').className = 'btn btn-danger';
+                document.getElementById('confirmBtn').onclick = () => this.deleteAccount();
+                this.showModal();
+            }
+
+            async deleteAccount() {
+                try {
+                    this.showLoading(true);
+                    
+                    const response = await authenticatedFetch('/api/users/deactivate_account/', {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        this.showAlert('Account deleted successfully. You will be redirected to the login page.', 'success');
+                        setTimeout(() => {
+                            clearAuthTokens();
+                            window.location.href = '/login/';
+                        }, 2000);
+                    } else {
+                        const error = await response.json();
+                        this.showAlert(error.detail || 'Failed to delete account', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error deleting account:', error);
+                    this.showAlert('Failed to delete account. Please try again.', 'error');
+                } finally {
+                    this.showLoading(false);
+                    this.hideModal();
+                }
+            }
+
+            showModal() {
+                document.getElementById('confirmModal').style.display = 'block';
+            }
+
+            hideModal() {
+                document.getElementById('confirmModal').style.display = 'none';
+            }
+
+            showAlert(message, type) {
+                const alertContainer = document.getElementById('alertContainer');
+                const alert = document.createElement('div');
+                alert.className = `alert alert-${type === 'error' ? 'error' : 'success'}`;
+                alert.textContent = message;
+                alert.style.display = 'block';
+                
+                alertContainer.appendChild(alert);
+                
+                setTimeout(() => {
+                    alert.remove();
+                }, 5000);
+            }
+
+            showLoading(show) {
+                document.getElementById('loadingIndicator').style.display = show ? 'block' : 'none';
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new AdminProfileManager();
+        });
+    </script>
+</body>
+</html>

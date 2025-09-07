@@ -4,852 +4,266 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Admin Dashboard - PDF Upload</title>
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>PDF Upload Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <style>
-      /* Modern Gen Z/Gamified Styles */
-      :root {
-        --primary: #6C63FF;
-        --primary-dark: #564FD8;
-        --secondary: #FF6B8B;
-        --accent: #36D6C3;
-        --dark: #1A1A2E;
-        --light: #FFFFFF;
-        --gray: #F5F5F7;
-        --gray-dark: #6C757D;
-        --success: #00C9A7;
-        --warning: #FFC75F;
-        --danger: #FF8066;
-        --gradient-primary: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        --gradient-accent: linear-gradient(135deg, var(--secondary), var(--accent));
-        --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
-        --shadow-md: 0 10px 15px rgba(0, 0, 0, 0.1);
-        --shadow-lg: 0 20px 25px rgba(0, 0, 0, 0.15);
-        --radius: 12px;
-        --radius-lg: 20px;
-      }
-
-      /* Global Styles */
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      
-      body {
-        font-family: 'Inter', sans-serif;
-        color: var(--dark);
-        background-color: var(--light);
-        line-height: 1.6;
-        min-height: 100vh;
-        padding: 20px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      }
-
-      h1, h2, h3, h4, h5, h6 {
-        font-family: 'Space Grotesk', sans-serif;
-        font-weight: 700;
-      }
-
-      .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        background: white;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-lg);
-        overflow: hidden;
-        animation: slideIn 0.8s ease-out;
-      }
-
-      @keyframes slideIn {
-        from {
-          opacity: 0;
-          transform: translateY(30px);
+        /* Upload-specific styles */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
         }
-        to {
-          opacity: 1;
-          transform: translateY(0);
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
         }
-      }
-
-      .header {
-        background: var(--gradient-primary);
-        color: white;
-        padding: 30px;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .header::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-        animation: shimmer 2s infinite;
-      }
-
-      @keyframes shimmer {
-        0% { left: -100%; }
-        100% { left: 100%; }
-      }
-
-      .header h1 {
-        font-size: 2.5rem;
-        margin-bottom: 10px;
-        position: relative;
-        z-index: 1;
-      }
-
-      .header p {
-        position: relative;
-        z-index: 1;
-      }
-
-      .main-content {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 30px;
-        padding: 30px;
-      }
-
-      .login-section, .upload-section {
-        background: var(--gray);
-        padding: 25px;
-        border-radius: var(--radius);
-        border: 1px solid #e9ecef;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        box-shadow: var(--shadow-sm);
-      }
-
-      .login-section:hover, .upload-section:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow-md);
-      }
-
-      .section-title {
-        font-size: 1.5rem;
-        margin-bottom: 20px;
-        color: var(--primary);
-        border-bottom: 2px solid var(--accent);
-        padding-bottom: 10px;
-      }
-
-      .form-group {
-        margin-bottom: 20px;
-      }
-
-      label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-        color: var(--dark);
-      }
-
-      input, textarea {
-        width: 100%;
-        padding: 12px;
-        border: 2px solid #ddd;
-        border-radius: var(--radius);
-        font-size: 16px;
-        transition: all 0.3s ease;
-        font-family: 'Inter', sans-serif;
-      }
-
-      input:focus, textarea:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
-      }
-
-      .file-input-wrapper {
-        position: relative;
-        display: inline-block;
-        width: 100%;
-      }
-
-      .file-input {
-        width: 100%;
-        height: 120px;
-        border: 2px dashed var(--primary);
-        border-radius: var(--radius);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        background: #f8f9ff;
-      }
-
-      .file-input:hover {
-        background: #e8f0ff;
-        border-color: var(--primary-dark);
-        transform: scale(1.02);
-      }
-
-      .file-input.dragover {
-        background: #dbeafe;
-        border-color: var(--primary-dark);
-        transform: scale(1.05);
-      }
-
-      .file-input.has-file {
-        background: #d1f2eb;
-        border-color: var(--success);
-      }
-
-      .file-text {
-        text-align: center;
-        color: var(--gray-dark);
-      }
-
-      .file-icon {
-        font-size: 2rem;
-        margin-bottom: 10px;
-        color: var(--primary);
-      }
-
-      .btn {
-        background: var(--gradient-primary);
-        color: white;
-        border: none;
-        padding: 12px 30px;
-        border-radius: var(--radius);
-        font-size: 16px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        width: 100%;
-        position: relative;
-        overflow: hidden;
-        font-weight: 600;
-      }
-
-      .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
-      }
-
-      .btn:disabled {
-        background: var(--gray-dark);
-        cursor: not-allowed;
-        transform: none;
-        box-shadow: none;
-      }
-
-      .btn:active {
-        transform: translateY(0);
-      }
-
-      .action-buttons {
-        margin-bottom: 20px;
-      }
-
-      .action-buttons .btn {
-        width: auto;
-        display: inline-block;
-        margin-right: 10px;
-        text-decoration: none;
-        text-align: center;
-      }
-
-      .progress-bar {
-        width: 100%;
-        height: 20px;
-        background: #f0f0f0;
-        border-radius: 10px;
-        overflow: hidden;
-        margin: 10px 0;
-        display: none;
-      }
-
-      .progress-fill {
-        height: 100%;
-        background: var(--gradient-accent);
-        transition: width 0.3s ease;
-        width: 0%;
-      }
-
-      .message {
-        padding: 15px;
-        border-radius: var(--radius);
-        margin: 15px 0;
-        font-weight: 600;
-        animation: fadeIn 0.5s ease-out;
-      }
-
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-
-      .success {
-        background: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-      }
-
-      .error {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-      }
-
-      .uploads-list {
-        grid-column: 1 / -1;
-        background: var(--gray);
-        padding: 25px;
-        border-radius: var(--radius);
-        border: 1px solid #e9ecef;
-        margin-top: 20px;
-      }
-
-      .upload-item {
-        background: white;
-        padding: 15px;
-        border-radius: var(--radius);
-        margin: 10px 0;
-        box-shadow: var(--shadow-sm);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        transition: transform 0.2s ease;
-      }
-
-      .upload-item:hover {
-        transform: translateX(5px);
-      }
-
-      .status-badge {
-        padding: 5px 12px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
-      }
-
-      .status-pending { background: #fff3cd; color: #856404; }
-      .status-processing { background: #cce5ff; color: #0066cc; }
-      .status-completed { background: #d1f2eb; color: #00875a; }
-      .status-failed { background: #f8d7da; color: #721c24; }
-
-      .logout-btn {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        background: rgba(255,255,255,0.2);
-        color: white;
-        border: 1px solid rgba(255,255,255,0.3);
-        padding: 8px 16px;
-        border-radius: 20px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        z-index: 2;
-        font-weight: 600;
-      }
-
-      .logout-btn:hover {
-        background: rgba(255,255,255,0.3);
-      }
-
-      /* Navigation styles */
-      .navbar {
-        background: white;
-        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-        border-radius: 12px;
-        width: 100%;
-        max-width: 98%;
-        padding: 0 20px;
-        margin: 0 auto 20px;
-      }
-      
-      .nav-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        height: 70px;
-      }
-      
-      .nav-brand {
-        display: flex;
-        align-items: center;
-      }
-      
-      .logo {
-        font-size: 24px;
-        font-weight: 700;
-        color: var(--primary);
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-      }
-      
-      .status-dot {
-        width: 10px;
-        height: 10px;
-        background: var(--accent);
-        border-radius: 50%;
-        margin-left: 5px;
-        position: relative;
-      }
-      
-      .status-dot::after {
-        content: '';
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background: var(--accent);
-        border-radius: 50%;
-        opacity: 0.6;
-        animation: pulse 1.5s ease-in-out infinite;
-      }
-      
-      @keyframes pulse {
-        0% { transform: scale(1); opacity: 0.6; }
-        50% { transform: scale(2); opacity: 0; }
-        100% { transform: scale(1); opacity: 0; }
-      }
-      
-      .nav-menu {
-        display: flex;
-        flex-grow: 1;
-        justify-content: space-between;
-        align-items: center;
-        margin-left: 40px;
-      }
-      
-      .nav-list {
-        display: flex;
-        list-style: none;
-      }
-      
-      .nav-item {
-        margin: 0 15px;
-      }
-      
-      .nav-link {
-        text-decoration: none;
-        color: var(--gray-dark);
-        font-weight: 500;
-        padding: 8px 5px;
-        transition: all 0.3s ease;
-        position: relative;
-      }
-      
-      .nav-link:hover {
-        color: var(--primary);
-      }
-      
-      .nav-link.active {
-        color: var(--primary);
-      }
-      
-      .nav-link.active::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 3px;
-        background: var(--primary);
-        border-radius: 3px;
-      }
-      
-      .nav-auth {
-        display: flex;
-        align-items: center;
-      }
-      
-      .auth-buttons {
-        display: flex;
-        gap: 15px;
-      }
-      
-      .btn-outline {
-        border: 2px solid var(--primary);
-        color: var(--primary);
-        background: transparent;
-        padding: 10px 20px;
-        border-radius: 6px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 14px;
-        transition: all 0.3s ease;
-      }
-      
-      .btn-outline:hover {
-        background: var(--primary);
-        color: white;
-      }
-      
-      .btn-primary {
-        background: var(--primary);
-        color: white;
-        border: 2px solid var(--primary);
-        padding: 10px 20px;
-        border-radius: 6px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 14px;
-        transition: all 0.3s ease;
-      }
-      
-      .btn-primary:hover {
-        background: var(--primary-dark);
-        border-color: var(--primary-dark);
-      }
-      
-      .nav-toggle {
-        display: none;
-        flex-direction: column;
-        cursor: pointer;
-      }
-      
-      .nav-toggle span {
-        width: 25px;
-        height: 3px;
-        background: var(--primary);
-        margin: 2px 0;
-        border-radius: 3px;
-        transition: all 0.3s ease;
-      }
-
-      /* Professional icons */
-      .icon-login {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236C63FF'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        margin-right: 8px;
-        vertical-align: middle;
-      }
-      
-      .icon-upload {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236C63FF'%3E%3Cpath d='M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        margin-right: 8px;
-        vertical-align: middle;
-      }
-      
-      .icon-list {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236C63FF'%3E%3Cpath d='M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        margin-right: 8px;
-        vertical-align: middle;
-      }
-      
-      .icon-file {
-        display: inline-block;
-        width: 24px;
-        height: 24px;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236C63FF'%3E%3Cpath d='M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        margin-bottom: 10px;
-      }
-
-      @media (max-width: 768px) {
-        .main-content {
-          grid-template-columns: 1fr;
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
         }
-        .header h1 {
-          font-size: 2rem;
-        }
+        
         .logout-btn {
-          position: static;
-          margin-top: 10px;
+            background: #dc3545;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
-        .nav-menu {
-          position: fixed;
-          top: 70px;
-          left: 0;
-          background: white;
-          width: 100%;
-          flex-direction: column;
-          margin-left: 0;
-          padding: 20px;
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-          transform: translateY(-100%);
-          opacity: 0;
-          visibility: hidden;
-          transition: all 0.3s ease;
-          z-index: 1000;
+        .logout-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
         }
         
-        .nav-menu.active {
-          transform: translateY(0);
-          opacity: 1;
-          visibility: visible;
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
         
-        .nav-list {
-          flex-direction: column;
-          width: 100%;
-          margin-bottom: 20px;
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
         }
         
-        .nav-item {
-          margin: 10px 0;
-          width: 100%;
-          text-align: center;
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
         }
         
-        .nav-auth {
-          flex-direction: column;
-          width: 100%;
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
-        .auth-buttons {
-          flex-direction: column;
-          width: 100%;
-          gap: 10px;
+        .uploads-section {
+            grid-column: 1 / -1;
         }
-        
-        .nav-toggle {
-          display: flex;
-        }
-        
-        .nav-toggle.active span:nth-child(1) {
-          transform: rotate(45deg) translate(5px, 5px);
-        }
-        
-        .nav-toggle.active span:nth-child(2) {
-          opacity: 0;
-        }
-        
-        .nav-toggle.active span:nth-child(3) {
-          transform: rotate(-45deg) translate(7px, -6px);
-        }
-      }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-brand">
-                <a href="#" class="logo">UniHandbooks<span class="status-dot"></span></a>
-            </div>
-            
-            <div class="nav-toggle" id="navToggle">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            
-            <div class="nav-menu" id="navMenu">
-                <ul class="nav-list">
-                    <li class="nav-item"><a href="#" class="nav-link active">Dashboard</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">Uploads</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">Analytics</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">Settings</a></li>
-                </ul>
-                
-                <div class="nav-auth">
-                    <div class="auth-buttons">
-                        <a href="#" class="btn-outline" id="loginNavBtn">Login</a>
-                        <a href="#" class="btn-primary" id="registerNavBtn">Register</a>
-                    </div>
+    <!-- Animated Background -->
+    <div class="bg-particles"></div>
+    {% include 'navbar.html' %}
+
+    <div class="dashboard-container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div>
+                    <h3 id="welcomeMessage">Welcome, Admin</h3>
+                    <small>PDF Upload Dashboard</small>
                 </div>
             </div>
-        </div>
-    </nav>
-
-    <div class="container">
-        <div class="header">
-            <button class="logout-btn" id="logoutBtn" style="display: none;">Logout</button>
-            <h1>Admin Dashboard</h1>
-            <p>University Handbook Management System</p>
+            <button id="logoutBtn" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </button>
         </div>
 
-        <div class="main-content">
-            <!-- Login Section -->
-            <div class="login-section" id="loginSection">
-                <h2 class="section-title"><span class="icon-login"></span>Admin Login</h2>
-                <form id="loginForm">
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required placeholder="Enter your email" />
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" required placeholder="Enter your password" />
-                    </div>
-                    <button type="submit" class="btn">Login</button>
-                </form>
-                <div id="loginMessage"></div>
-            </div>
-
+        <div class="dashboard-grid">
             <!-- Upload Section -->
-            <div class="upload-section" id="uploadSection" style="display: none;">
-                <h2 class="section-title"><span class="icon-upload"></span>Upload PDF</h2>
-                <div class="action-buttons">
-                    <a href="http://127.0.0.1:8000/admin-reprocess/" class="btn">Reprocess Latest PDF</a>
+            <div class="card">
+                <h2 class="section-title">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    Upload PDF Document
+                </h2>
+                
+                <div class="action-buttons" style="margin-bottom: 20px;">
+                    <button id="reprocessBtn" class="btn btn-secondary">
+                        <i class="fas fa-redo"></i>
+                        Reprocess Latest PDF
+                    </button>
                 </div>
+
                 <form id="uploadForm">
                     <div class="form-group">
                         <label for="fileInputHidden">Select PDF File</label>
                         <div class="file-input" id="fileInput">
                             <div class="file-text">
-                                <div class="icon-file"></div>
+                                <div class="icon-file">
+                                    <i class="fas fa-file-pdf"></i>
+                                </div>
                                 <p>Click or drag PDF file here</p>
                                 <small>Maximum size: 100MB</small>
                             </div>
                         </div>
                         <input type="file" id="fileInputHidden" name="pdfFile" accept=".pdf" style="display: none;" />
                     </div>
+
                     <div class="form-group">
-                        <label for="description">Description (Optional)</label>
-                        <textarea id="description" name="description" rows="3" placeholder="Brief description of the handbook..."></textarea>
+                        <label for="description">
+                            <i class="fas fa-align-left"></i>
+                            Description (Optional)
+                        </label>
+                        <textarea id="description" name="description" rows="3" placeholder="Brief description of the document..."></textarea>
                     </div>
-                    <div class="progress-bar" id="progressBar">
+
+                    <div class="progress-bar" id="progressBar" style="display: none;">
                         <div class="progress-fill" id="progressFill"></div>
                     </div>
-                    <button type="submit" class="btn" id="uploadBtn">Upload PDF</button>
+
+                    <button type="submit" class="btn btn-primary" id="uploadBtn">
+                        <i class="fas fa-upload"></i>
+                        Upload PDF
+                    </button>
                 </form>
+
                 <div id="uploadMessage"></div>
             </div>
-        </div>
 
-        <!-- Uploads List -->
-        <div class="uploads-list" id="uploadsList" style="display: none;">
-            <h2 class="section-title"><span class="icon-list"></span>Recent Uploads</h2>
-            <div id="uploadsContainer">
-                <!-- Sample upload items for demonstration -->
-                <div class="upload-item">
-                    <div>
-                        <strong>Student Handbook 2024.pdf</strong><br />
-                        <small>Uploaded: 2024-01-15 14:30</small>
+            <!-- Quick Stats Card -->
+            <div class="card">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Upload Statistics
+                </h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalUploads">-</div>
+                        <div class="stat-label">Total Uploads</div>
                     </div>
-                    <span class="status-badge status-completed">Completed</span>
+                    <div class="stat-item">
+                        <div class="stat-number" id="processingCount">-</div>
+                        <div class="stat-label">Processing</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="completedCount">-</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="failedCount">-</div>
+                        <div class="stat-label">Failed</div>
+                    </div>
                 </div>
-                <div class="upload-item">
-                    <div>
-                        <strong>Academic Policies.pdf</strong><br />
-                        <small>Uploaded: 2024-01-14 09:15</small>
+            </div>
+
+            <!-- Recent Uploads Section -->
+            <div class="card uploads-section">
+                <h2 class="section-title">
+                    <i class="fas fa-history"></i>
+                    Recent Uploads
+                </h2>
+                
+                <div class="uploads-controls" style="margin-bottom: 20px;">
+                    <button id="refreshBtn" class="btn btn-outline">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                    <div class="search-box">
+                        <input type="text" id="searchUploads" placeholder="Search uploads...">
+                        <i class="fas fa-search"></i>
                     </div>
-                    <span class="status-badge status-processing">Processing</span>
                 </div>
-                <div class="upload-item">
-                    <div>
-                        <strong>Course Catalog.pdf</strong><br />
-                        <small>Uploaded: 2024-01-13 16:45</small>
+
+                <div id="uploadsContainer">
+                    <!-- Dynamic content will be loaded here -->
+                    <div class="loading-spinner" style="text-align: center; padding: 40px;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading uploads...</p>
                     </div>
-                    <span class="status-badge status-pending">Pending</span>
+                </div>
+
+                <div class="pagination" id="uploadsPagination" style="display: none;">
+                    <button class="btn btn-outline" id="prevPage">
+                        <i class="fas fa-chevron-left"></i>
+                        Previous
+                    </button>
+                    <span id="pageInfo">Page 1 of 1</span>
+                    <button class="btn btn-outline" id="nextPage">
+                        Next
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-    <script src="{% static 'js/script.js' %}"></script>
+
+    <!-- Include only the upload-related modules -->
+    <script src="{% static 'js/auth.js' %}"></script>
+    <script src="{% static 'js/upload.js' %}"></script>
+    <script src="{% static 'js/upload-app.js' %}"></script>
+
     <script>
-        // Toggle mobile navigation
-        const navToggle = document.getElementById('navToggle');
-        const navMenu = document.getElementById('navMenu');
-        
-        if (navToggle) {
-            navToggle.addEventListener('click', () => {
-                navMenu.classList.toggle('active');
-                navToggle.classList.toggle('active');
-            });
+        // CSRF token setup
+        function getCSRFToken() {
+            return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
+                   getCookie('csrftoken');
         }
-        
-        // File upload drag and drop functionality
-        const fileInput = document.getElementById('fileInput');
-        const fileInputHidden = document.getElementById('fileInputHidden');
-        
-        if (fileInput && fileInputHidden) {
-            fileInput.addEventListener('click', () => {
-                fileInputHidden.click();
-            });
-            
-            fileInput.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                fileInput.classList.add('dragover');
-            });
-            
-            fileInput.addEventListener('dragleave', () => {
-                fileInput.classList.remove('dragover');
-            });
-            
-            fileInput.addEventListener('drop', (e) => {
-                e.preventDefault();
-                fileInput.classList.remove('dragover');
-                
-                if (e.dataTransfer.files.length) {
-                    fileInputHidden.files = e.dataTransfer.files;
-                    fileInput.classList.add('has-file');
-                    fileInput.querySelector('.file-text p').textContent = e.dataTransfer.files[0].name;
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
                 }
-            });
-            
-            fileInputHidden.addEventListener('change', () => {
-                if (fileInputHidden.files.length) {
-                    fileInput.classList.add('has-file');
-                    fileInput.querySelector('.file-text p').textContent = fileInputHidden.files[0].name;
-                }
-            });
+            }
+            return cookieValue;
         }
-        
-        // Simple form submission handlers
-        const loginForm = document.getElementById('loginForm');
-        const loginSection = document.getElementById('loginSection');
-        const uploadSection = document.getElementById('uploadSection');
-        const uploadsList = document.getElementById('uploadsList');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const loginNavBtn = document.getElementById('loginNavBtn');
-        const registerNavBtn = document.getElementById('registerNavBtn');
-        
-        if (loginForm) {
-            loginForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                // Simulate login
-                loginSection.style.display = 'none';
-                uploadSection.style.display = 'block';
-                uploadsList.style.display = 'block';
-                logoutBtn.style.display = 'block';
-                
-                // Show success message
-                const loginMessage = document.getElementById('loginMessage');
-                loginMessage.innerHTML = '<div class="message success">Login successful! Welcome back.</div>';
-            });
-        }
-        
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', () => {
-                // Simulate logout
-                loginSection.style.display = 'block';
-                uploadSection.style.display = 'none';
-                uploadsList.style.display = 'none';
-                logoutBtn.style.display = 'none';
-                
-                // Clear forms
-                document.getElementById('loginForm').reset();
-                document.getElementById('uploadForm').reset();
-                
-                // Reset file input
-                if (fileInput) {
-                    fileInput.classList.remove('has-file');
-                    fileInput.querySelector('.file-text p').textContent = 'Click or drag PDF file here';
-                }
-            });
-        }
-        
-        // Navigation buttons
-        if (loginNavBtn) {
-            loginNavBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                // Scroll to login section
-                loginSection.scrollIntoView({ behavior: 'smooth' });
-            });
-        }
+
+        // Auto-refresh uploads every 30 seconds
+        setInterval(() => {
+            if (window.uploadApp && window.uploadApp.isInitialized) {
+                window.uploadApp.refreshUploads();
+            }
+        }, 30000);
     </script>
 </body>
 </html>

@@ -1,0 +1,156 @@
+{% load static %}
+<!-- Navigation Component -->
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="nav-brand">
+            <a href="/admin-dashboard/" class="logo">Zpredict<span class="status-dot"></span></a>
+        </div>
+        
+        <div class="nav-toggle" id="navToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        
+        <div class="nav-menu" id="navMenu">
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="/admin-dashboard/" class="nav-link" data-page="admin-uploads">
+                        <i class="fas fa-file-upload"></i> Uploads
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin-analytics/" class="nav-link" data-page="admin-analytics">
+                        <i class="fas fa-chart-line"></i> Analytics
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin-profile/" class="nav-link" data-page="admin-settings">
+                        <i class="fas fa-cog"></i> Profile
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="nav-auth">
+                <!-- Show for non-logged in users -->
+                <div class="auth-buttons" id="authButtons">
+                    <a href="/login/" class="btn-outline" id="loginNavBtn">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                </div>
+                <!-- Show for logged in users -->
+                <div class="user-menu" id="userMenu" style="display: none;">
+                    <div class="user-info">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="userName">Admin</span>
+                    </div>
+                    <div class="user-actions">
+                        <a href="/admin-register/" class="btn-primary" id="registerNavBtn">
+                            <i class="fas fa-user-plus"></i> Register
+                        </a>
+                        <button class="btn-outline" id="logoutNavBtn">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Navbar JavaScript for Authentication State Management -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize navbar authentication state
+    checkNavbarAuthStatus();
+    
+    // Setup mobile navigation toggle
+    setupMobileNav();
+    
+    // Setup logout functionality
+    setupLogoutHandler();
+});
+
+function checkNavbarAuthStatus() {
+    const token = localStorage.getItem('access_token');
+    const authButtons = document.getElementById('authButtons');
+    const userMenu = document.getElementById('userMenu');
+    const userName = document.getElementById('userName');
+    
+    if (token && isValidToken(token)) {
+        // User is logged in - show user menu with logout and register
+        if (authButtons) authButtons.style.display = 'none';
+        if (userMenu) userMenu.style.display = 'flex';
+        
+        // Update username if available
+        const userInfo = getUserInfo();
+        if (userName && userInfo) {
+            userName.textContent = userInfo.first_name || userInfo.email?.split('@')[0] || 'Admin';
+        }
+    } else {
+        // User is not logged in - show login button only
+        if (authButtons) authButtons.style.display = 'flex';
+        if (userMenu) userMenu.style.display = 'none';
+    }
+}
+
+function isValidToken(token) {
+    if (!token) return false;
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.exp * 1000 > Date.now();
+    } catch {
+        return false;
+    }
+}
+
+function getUserInfo() {
+    try {
+        const userInfoStr = localStorage.getItem('user_info');
+        return userInfoStr ? JSON.parse(userInfoStr) : null;
+    } catch {
+        return null;
+    }
+}
+
+function setupMobileNav() {
+    const navToggle = document.getElementById('navToggle');
+    const navMenu = document.getElementById('navMenu');
+    
+    if (navToggle && navMenu) {
+        navToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            navToggle.classList.toggle('active');
+        });
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!navToggle.contains(e.target) && !navMenu.contains(e.target)) {
+                navMenu.classList.remove('active');
+                navToggle.classList.remove('active');
+            }
+        });
+    }
+}
+
+function setupLogoutHandler() {
+    const logoutBtn = document.getElementById('logoutNavBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            // Clear authentication data
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('user_info');
+            
+            // Update navbar state
+            checkNavbarAuthStatus();
+            
+            // Redirect to login page
+            window.location.href = '/login/';
+        });
+    }
+}
+
+// Listen for authentication changes from other parts of the app
+window.addEventListener('authStatusChanged', checkNavbarAuthStatus);
+</script>

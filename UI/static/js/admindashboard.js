@@ -3,13 +3,25 @@ class AdminDashboard {
     constructor() {
         this.apiBaseUrl = '/api/';
         this.token = localStorage.getItem('access_token'); // Admin tokens are stored as access_token
-        this.adminInfo = JSON.parse(localStorage.getItem('admin_info') || localStorage.getItem('user_info') || '{}');
+        this.adminInfo = this.parseStorageItem(localStorage.getItem('admin_info') || localStorage.getItem('user_info'));
         this.currentChart = null;
         this.currentChartType = 'predictions';
         this.feedbackPage = 1;
         this.feedbackSearch = '';
         this.feedbackFilter = 'all';
         this.init();
+    }
+
+    parseStorageItem(item) {
+        if (!item || item === 'undefined' || item === 'null') {
+            return {};
+        }
+        try {
+            return JSON.parse(item);
+        } catch (error) {
+            console.warn('Failed to parse storage item:', item, error);
+            return {};
+        }
     }
 
     async init() {
@@ -301,11 +313,19 @@ class AdminDashboard {
     }
 
     renderChart(type) {
-        const ctx = document.getElementById('analyticsChart');
+        const canvas = document.getElementById('analyticsChart');
+        if (!canvas) return;
         
+        const ctx = canvas.getContext('2d');
+        
+        // Destroy existing chart instance
         if (this.currentChart) {
             this.currentChart.destroy();
+            this.currentChart = null;
         }
+
+        // Clear any existing Chart.js instances on this canvas
+        Chart.getChart(canvas)?.destroy();
 
         const data = this.analyticsData[type];
         if (!data) return;

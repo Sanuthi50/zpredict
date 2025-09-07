@@ -16,40 +16,8 @@
     <!-- Animated background particles -->
     <div class="bg-particles" id="particles"></div>
     
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-brand">
-                <a href="/" class="logo">
-                    Zpredict <span class="status-dot"></span>
-                </a>
-            </div>
-            
-            <div class="nav-menu" id="navMenu">
-                <ul class="nav-list">
-                    <li class="nav-item">
-                        <a href="/admin-dashboard/" class="nav-link active">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/feedback-management/" class="nav-link">Feedback</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/admin-reprocess/" class="nav-link">Reprocess</a>
-                    </li>
-                </ul>
-                
-                <div class="nav-auth">
-                    <div class="user-menu">
-                        <span class="user-info">
-                            <i class="fas fa-user-shield"></i>
-                            <span id="adminName">Admin</span>
-                        </span>
-                        <button class="btn btn-outline" id="logoutBtn">Logout</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <!-- Include Navbar Component -->
+    {% include 'navbar.html' %}
 
     <!-- Main Content -->
     <div class="main-container">
@@ -330,5 +298,13 @@
         display: block;
     }
     </style>
+    
+    <script src="{% static 'js/admindashboard.js' %}"></script>
+    <script>
+        // Initialize the admin dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            new AdminDashboard();
+        });
+    </script>
 </body>
 </html>

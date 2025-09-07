@@ -17,15 +17,14 @@ logger = logging.getLogger(__name__)
 
 class AdminView(View):
     def get(self, request):
+        return render(request, 'admin-dashboard.html')
+class AdminAnalyticsView(View):
+    def get(self, request):
         return render(request, 'dashboard.html')
 
 class AdminRegisterView(View):
     def get(self, request):
         return render(request, 'admin-register.html')
-class AdminLoginView(View): 
-    def get (self, request):
-        return render(request, 'admin-dashboard.html')
-
 class AdminReprocessView(View):
     def get(self, request):
         logger.info("=== AdminReprocessView: Starting token validation ===")
@@ -118,6 +117,14 @@ class AdminReprocessView(View):
 class FeedbackManagementView(View):
     def get(self, request):
         return render(request, 'feedback-management.html')
+
+class AdminProfileView(View):
+    def get(self, request):
+        return render(request, 'adminprofile.html')
+
+class AdminLoginView(View):
+    def get(self, request):
+        return render(request, 'admin-login.html')
 
 
 

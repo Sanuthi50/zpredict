@@ -212,13 +212,37 @@ class AdminUploadAPIView(APIView):
             }, status=500)
 
     def get(self, request):
-        """Get list of uploads for admin"""
+        """Get list of uploads for admin with pagination"""
         if not is_admin_user(request.user):
             return Response({"error": "Admin access required"}, status=403)
 
-        uploads = AdminUpload.objects.filter(admin=request.user, active=True)
-        upload_data = []
+        # Get pagination parameters
+        page = int(request.GET.get('page', 1))
+        per_page = int(request.GET.get('per_page', 10))
+        search = request.GET.get('search', '')
         
+        # Build query
+        uploads_query = AdminUpload.objects.filter(
+            admin=request.user, 
+            active=True
+        ).order_by('-uploaded_at')
+        
+        # Apply search filter if provided
+        if search:
+            uploads_query = uploads_query.filter(
+                Q(original_filename__icontains=search) | 
+                Q(description__icontains=search)
+            )
+        
+        # Calculate pagination
+        total_uploads = uploads_query.count()
+        total_pages = (total_uploads + per_page - 1) // per_page
+        start_index = (page - 1) * per_page
+        end_index = start_index + per_page
+        
+        uploads = uploads_query[start_index:end_index]
+        
+        upload_data = []
         for upload in uploads:
             upload_data.append({
                 'id': upload.id,
@@ -230,7 +254,20 @@ class AdminUploadAPIView(APIView):
                 'is_active': upload.active
             })
         
-        return Response({'uploads': upload_data})
+        # Pagination info
+        pagination = {
+            'current_page': page,
+            'total_pages': total_pages,
+            'total_items': total_uploads,
+            'per_page': per_page,
+            'has_next': page < total_pages,
+            'has_previous': page > 1
+        }
+        
+        return Response({
+            'uploads': upload_data,
+            'pagination': pagination
+        })
 
 class AdminDashboardAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -268,19 +305,49 @@ class AdminDashboardAPIView(APIView):
             'submitted_at': feedback.submitted_at
         } for feedback in recent_feedbacks]
         
-        # Get recent uploads
-        recent_uploads = AdminUpload.objects.filter(
+        # Get recent uploads with pagination support
+        page = int(request.GET.get('page', 1))
+        per_page = int(request.GET.get('per_page', 10))
+        search = request.GET.get('search', '')
+        
+        uploads_query = AdminUpload.objects.filter(
             admin=request.user, 
             active=True
-        )[:5]
+        ).order_by('-uploaded_at')
+        
+        # Apply search filter if provided
+        if search:
+            uploads_query = uploads_query.filter(
+                Q(original_filename__icontains=search) | 
+                Q(description__icontains=search)
+            )
+        
+        # Calculate pagination
+        total_uploads = uploads_query.count()
+        total_pages = (total_uploads + per_page - 1) // per_page
+        start_index = (page - 1) * per_page
+        end_index = start_index + per_page
+        
+        recent_uploads = uploads_query[start_index:end_index]
         
         uploads_data = [{
             'id': upload.id,
             'filename': upload.original_filename,
             'uploaded_at': upload.uploaded_at,
             'processing_status': upload.processing_status,
-            'file_size': upload.get_file_size_display()
+            'file_size': upload.get_file_size_display(),
+            'description': upload.description or ''
         } for upload in recent_uploads]
+        
+        # Pagination info
+        pagination = {
+            'current_page': page,
+            'total_pages': total_pages,
+            'total_items': total_uploads,
+            'per_page': per_page,
+            'has_next': page < total_pages,
+            'has_previous': page > 1
+        }
         
         # Get recent prediction sessions
         recent_predictions = PredictionSession.objects.filter(active=True)[:5]
@@ -297,7 +364,8 @@ class AdminDashboardAPIView(APIView):
             'stats': stats,
             'recent_feedbacks': feedbacks_data,
             'recent_uploads': uploads_data,
-            'recent_predictions': predictions_data
+            'recent_predictions': predictions_data,
+            'pagination': pagination
         })
 @method_decorator(csrf_exempt, name='dispatch')
 class ChatAPIView(APIView):
@@ -637,7 +705,7 @@ def admin_login(request):
     # Authenticate admin user
     user = authenticate(username=username, password=password)
     
-    if user and user.is_admin:
+    if user and user.is_admin and user.active:
         refresh = RefreshToken.for_user(user)
         return Response({
             'refresh': str(refresh),
@@ -647,6 +715,10 @@ def admin_login(request):
             'first_name': user.first_name,
             'last_name': user.last_name
         })
+    elif user and user.is_admin and not user.active:
+        return Response({
+            'detail': 'Account has been deactivated. Please contact another admin.'
+        }, status=status.HTTP_401_UNAUTHORIZED)
     else:
         return Response({
             'detail': 'Invalid admin credentials'

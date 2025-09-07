@@ -102,7 +102,7 @@ const ApiService = (() => {
             errorMessage = "Your session has expired. Please login again.";
             // Redirect to login after a delay
             setTimeout(() => {
-                window.location.href = "/login/";
+                window.location.href = "/website/login/";
             }, 2000);
         } else if (response.status === 403) {
             errorMessage = "You don't have permission to access this feature.";
@@ -981,7 +981,7 @@ document.addEventListener('DOMContentLoaded', () => {
         UIController.showError("Please login to access the prediction system.");
         // You might want to redirect to login page after a delay
         setTimeout(() => {
-            window.location.href = "/login/";
+            window.location.href = "/website/login/";
         }, 3000);
         return;
     }
@@ -994,7 +994,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!Config.getToken()) {
             UIController.showError("Your session has expired. Please login again.");
             setTimeout(() => {
-                window.location.href = "/login/";
+                window.location.href = "/website/login/";
             }, 2000);
         }
     }, 300000); // Check every 5 minutes
