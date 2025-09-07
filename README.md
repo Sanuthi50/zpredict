@@ -426,11 +426,6 @@ We welcome contributions to ZPredict! Here's how you can help:
 - Update API documentation for new endpoints
 - Ensure all tests pass before submitting
 - Use meaningful commit messages
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
 ## Support
 
 For support, questions, or feature requests:
