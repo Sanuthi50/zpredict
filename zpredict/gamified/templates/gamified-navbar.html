@@ -1,0 +1,266 @@
+{% load static %}
+<!-- Gamified Navbar Component -->
+<style>
+    /* Gamified Navbar Styles */
+    :root {
+        --neon-blue: #00f3ff;
+        --neon-pink: #ff00ff;
+        --neon-green: #39ff14;
+        --neon-yellow: #ffff00;
+        --dark-bg: #0a1a3b;
+        --darker-bg: #050b1f;
+    }
+    
+    .gamified-navbar {
+        background: rgba(10, 10, 31, 0.9);
+        backdrop-filter: blur(10px);
+        border-bottom: 2px solid var(--neon-green);
+        padding: 15px 0;
+        position: relative;
+        z-index: 1000;
+        width: 100%;
+    }
+    
+    .gamified-nav-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    .gamified-logo {
+        font-family: 'Orbitron', sans-serif;
+        font-weight: 700;
+        font-size: 1.8rem;
+        color: var(--neon-blue);
+        text-shadow: 0 0 10px var(--neon-blue);
+        text-decoration: none;
+    }
+    
+    .gamified-nav-menu {
+        display: flex;
+        list-style: none;
+        gap: 30px;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .gamified-nav-link {
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+        position: relative;
+        padding: 5px 0;
+        transition: all 0.3s;
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .gamified-nav-link::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--neon-pink);
+        transition: width 0.3s;
+    }
+    
+    .gamified-nav-link:hover {
+        color: var(--neon-pink);
+    }
+    
+    .gamified-nav-link:hover::after {
+        width: 100%;
+    }
+    
+    .gamified-nav-link.active {
+        color: var(--neon-yellow);
+    }
+    
+    .gamified-nav-link.active::after {
+        width: 100%;
+        background: var(--neon-yellow);
+    }
+    
+    .gamified-nav-toggle {
+        display: none;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .gamified-nav-toggle .bar {
+        width: 25px;
+        height: 3px;
+        background: var(--neon-blue);
+        transition: all 0.3s;
+        border-radius: 2px;
+    }
+    
+    .gamified-nav-toggle.active .bar:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+    }
+    
+    .gamified-nav-toggle.active .bar:nth-child(2) {
+        opacity: 0;
+    }
+    
+    .gamified-nav-toggle.active .bar:nth-child(3) {
+        transform: rotate(-45deg) translate(7px, -6px);
+    }
+    
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .gamified-nav-menu {
+            position: fixed;
+            top: 70px;
+            right: -100%;
+            background: var(--dark-bg);
+            width: 80%;
+            height: calc(100vh - 70px);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: right 0.3s ease;
+            border-left: 2px solid var(--neon-blue);
+        }
+        
+        .gamified-nav-menu.active {
+            right: 0;
+        }
+        
+        .gamified-nav-toggle {
+            display: flex;
+        }
+        
+        .gamified-nav-link {
+            font-size: 1.2rem;
+            margin: 10px 0;
+        }
+    }
+</style>
+
+<nav class="gamified-navbar">
+    <div class="gamified-nav-container">
+        <a href="http://127.0.0.1:8000/gamified/" class="gamified-logo">ZPREDICT</a>
+        <ul class="gamified-nav-menu" id="gamifiedNavMenu">
+            <li><a href="http://127.0.0.1:8000/gamified/" class="gamified-nav-link" data-page="home">Home</a></li>
+            <li><a href="http://127.0.0.1:8000/gamified/#about" class="gamified-nav-link" data-page="about">About</a></li>
+            <li><a href="http://127.0.0.1:8000/gamified/#feedback" class="gamified-nav-link" data-page="feedback">Feedback</a></li>
+            <li><a href="http://127.0.0.1:8000/gamified/recommendation/" class="gamified-nav-link" data-page="recommendation">Career Recommendations</a></li>
+            <li><a href="http://127.0.0.1:8000/gamified/predict/" class="gamified-nav-link" data-page="predict">Predict</a></li>
+            <li><a href="http://127.0.0.1:8000/gamified/chat/" class="gamified-nav-link" data-page="chat">Chat</a></li>
+            <li><a href="http://127.0.0.1:8000/gamified/student-profile/" class="gamified-nav-link" data-page="profile">Student Profile</a></li>
+            
+            <!-- Authentication buttons (shown when not logged in) -->
+            <div id="authButtons" style="display: flex; gap: 15px;">
+                <li><a href="http://127.0.0.1:8000/gamified/login/" class="gamified-nav-link" data-page="login">Login</a></li>
+                <li><a href="http://127.0.0.1:8000/gamified/register/" class="gamified-nav-link" data-page="register">Register</a></li>
+            </div>
+            
+            <!-- User menu (shown when logged in) -->
+            <div id="userMenu" style="display: none; gap: 15px; align-items: center;">
+                <li><span class="gamified-nav-link" style="color: var(--neon-green);">Welcome, <span id="userName">User</span>!</span></li>
+                <li><a href="#" id="logoutBtn" class="gamified-nav-link" data-page="logout" style="color: var(--neon-pink);">Logout</a></li>
+            </div>
+        </ul>
+        <button class="gamified-nav-toggle" id="gamifiedNavToggle">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
+    </div>
+</nav>
+
+<script>
+    // Gamified Navbar JavaScript
+    class GamifiedNavbar {
+        constructor() {
+            this.init();
+        }
+        
+        init() {
+            this.setupToggle();
+            this.setupActiveLink();
+            this.setupMobileClose();
+            this.initAuthentication();
+        }
+        
+        initAuthentication() {
+            // Wait for authentication.js to be loaded
+            if (typeof initAuthUI === 'function') {
+                initAuthUI();
+            } else {
+                // Retry after a short delay if authentication.js isn't loaded yet
+                setTimeout(() => {
+                    if (typeof initAuthUI === 'function') {
+                        initAuthUI();
+                    }
+                }, 100);
+            }
+        }
+        
+        setupToggle() {
+            const toggle = document.getElementById('gamifiedNavToggle');
+            const menu = document.getElementById('gamifiedNavMenu');
+            
+            if (toggle && menu) {
+                toggle.addEventListener('click', () => {
+                    menu.classList.toggle('active');
+                    toggle.classList.toggle('active');
+                });
+            }
+        }
+        
+        setupActiveLink() {
+            const currentPath = window.location.pathname;
+            const links = document.querySelectorAll('.gamified-nav-link');
+            
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && (currentPath === href || currentPath.includes(link.dataset.page))) {
+                    link.classList.add('active');
+                }
+            });
+        }
+        
+        setupMobileClose() {
+            const links = document.querySelectorAll('.gamified-nav-link');
+            const menu = document.getElementById('gamifiedNavMenu');
+            const toggle = document.getElementById('gamifiedNavToggle');
+            
+            links.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (menu) menu.classList.remove('active');
+                    if (toggle) toggle.classList.remove('active');
+                });
+            });
+        }
+    }
+    
+    // Initialize navbar when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        new GamifiedNavbar();
+    });
+</script>
+
+<!-- Include authentication utilities -->
+<script src="{% static 'js/authentication.js' %}"></script>
+<script>
+    // Additional authentication setup for gamified navbar
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initialize authentication UI after both scripts are loaded
+        setTimeout(() => {
+            if (typeof initAuthUI === 'function') {
+                initAuthUI();
+            }
+        }, 50);
+    });
+</script>

@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Back to Zpredict</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/signInstyle.css' %}">
+</head>
+<body>
+     {% include 'navbar.html' %}
+     
+     <div class="main-container">      
+        <div class="header">
+            <h1 class="title">Welcome Back</h1>
+            <p class="subtitle">Ready to continue?</p>
+        </div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <div class="input-container">
+                    <div class="input-icon">
+                        <img src="{% static 'images/communication.png' %}" alt="Email Icon">
+                    </div>
+                    <input type="email" id="email" name="email" class="form-input" placeholder="Email Address" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="input-container">
+                    <div class="input-icon">
+                        <img src="{% static 'images/password.png' %}" alt="Password Icon">
+                    </div>
+                    <input type="password" id="password" name="password" class="form-input" placeholder="Password" required>
+                </div>
+            </div>
+            
+            <button type="submit" class="submit-btn" id="submitBtn">
+                Let's Go! 
+            </button>
+        </form>
+        
+        <div class="login-extras">
+            <a href="#" class="forgot-password">Forgot your password? </a>  <span class="feature-icon"><img src="{% static 'images/mental-health.png' %}" alt="Login"></span>
+        </div>
+         <p class="signup-prompt">Don't have an account? <a href="http://127.0.0.1:8000/website/register/" class="signup-link">Sign up</a></p>
+        
+        <div class="status" id="status"></div>
+    </div>
+
+    <script src="{% static 'js/signInscript.js' %}"></script>
+</body>
+</html>

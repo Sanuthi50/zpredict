@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat - AI Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{% static 'css/chatstyle.css' %}" rel="stylesheet">
+    
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <!-- Floating Particles -->
+    <div class="particles">
+        <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+        <div class="particle" style="left: 20%; animation-delay: 2s;"></div>
+        <div class="particle" style="left: 30%; animation-delay: 4s;"></div>
+        <div class="particle" style="left: 40%; animation-delay: 6s;"></div>
+        <div class="particle" style="left: 50%; animation-delay: 8s;"></div>
+        <div class="particle" style="left: 60%; animation-delay: 10s;"></div>
+        <div class="particle" style="left: 70%; animation-delay: 12s;"></div>
+        <div class="particle" style="left: 80%; animation-delay: 14s;"></div>
+        <div class="particle" style="left: 90%; animation-delay: 16s;"></div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>AI Chat Assistant- Ask Questions From UGC handbook</h1>
+            <p>AI Chat Assistant can make mistakes - be cautious about answers!<span class="status-indicator"></span> Online</p>
+        </div>
+
+        <!-- Chat Messages -->
+        <div class="chat-messages" id="chatMessages">
+            <div class="welcome-message">
+                Start a conversation - Ask me anything from UGC handbook!
+                <br><small>Your AI assistant is ready to chat</small>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+            <div class="input-wrapper">
+                <textarea 
+                    id="question" 
+                    placeholder="Type your message..." 
+                    rows="1"
+                ></textarea>
+            </div>
+            <button id="sendBtn">Send</button>
+        </div>
+    </div>
+
+</script>
+    <script src="{% static 'js/chatscript.js' %}"></script>
+    <script>
+       
+    </script>
+</body>
+</html>

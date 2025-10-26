@@ -1,0 +1,1238 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Recommendation System - ZPredict</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Game-inspired styles matching home page */
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ff;
+            --neon-green: #39ff14;
+            --neon-yellow: #ffff00;
+            --dark-bg: #0a1a3b;
+            --darker-bg: #050b1f;
+            --card-bg: rgba(16, 18, 37, 0.8);
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--darker-bg) 0%, var(--dark-bg) 70%);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            background-attachment: fixed;
+            cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><rect x='0' y='0' width='4' height='4' fill='%2300f3ff'/><rect x='4' y='4' width='4' height='4' fill='%2300f3ff'/><rect x='8' y='8' width='4' height='4' fill='%2300f3ff'/><rect x='12' y='12' width='4' height='4' fill='%2300f3ff'/></svg>") 8 8, auto;
+        }
+
+        a, button, .feature-card {
+            cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><rect x='0' y='0' width='16' height='16' fill='%23ff00ff'/><rect x='2' y='2' width='12' height='12' fill='%23000'/><rect x='4' y='4' width='8' height='8' fill='%23ff00ff'/></svg>") 8 8, pointer;
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            height: 5px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1001;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+            transition: width 0.3s ease;
+        }
+
+        /* Scanlines effect */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0.03) 50%,
+                rgba(0, 0, 0, 0.1) 50%
+            );
+            background-size: 100% 4px;
+            z-index: 99;
+            pointer-events: none;
+            opacity: 0.2;
+        }
+
+        /* Game UI corners */
+        .game-ui-corner {
+            position: fixed;
+            width: 150px;
+            height: 150px;
+            z-index: 5;
+            pointer-events: none;
+        }
+        
+        .corner-top-left {
+            top: 0;
+            left: 0;
+            border-top: 4px solid var(--neon-blue);
+            border-left: 4px solid var(--neon-blue);
+        }
+        
+        .corner-top-right {
+            top: 0;
+            right: 0;
+            border-top: 4px solid var(--neon-pink);
+            border-right: 4px solid var(--neon-pink);
+        }
+        
+        .corner-bottom-left {
+            bottom: 0;
+            left: 0;
+            border-bottom: 4px solid var(--neon-green);
+            border-left: 4px solid var(--neon-green);
+        }
+        
+        .corner-bottom-right {
+            bottom: 0;
+            right: 0;
+            border-bottom: 4px solid var(--neon-yellow);
+            border-right: 4px solid var(--neon-yellow);
+        }
+
+        /* Animated background particles */
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Floating particles */
+        .floating-icon {
+            position: absolute;
+            z-index: 2;
+            opacity: 0.7;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+
+        /* Pixelated elements */
+        .pixel-border {
+            border: 4px solid var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue), inset 0 0 10px rgba(0, 243, 255, 0.2);
+            position: relative;
+        }
+        
+        .pixel-border::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            border: 2px solid var(--neon-pink);
+            pointer-events: none;
+        }
+
+        /* 8-bit inspired text */
+        .bit-text {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+            letter-spacing: 1px;
+        }
+        
+        .bit-text-sm {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+        }
+        
+        /* Futuristic text */
+        .futuristic-text {
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Main container */
+        .main-container {
+            padding-top: 120px;
+            padding-bottom: 60px;
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+        }
+
+        /* Navigation tabs */
+        .nav-tabs {
+            background: transparent;
+            border: none;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .nav-tabs .nav-item {
+            margin: 0 15px;
+        }
+
+        .nav-tabs .nav-link {
+            background: var(--card-bg);
+            border: 2px solid var(--neon-blue);
+            color: #ccc;
+            padding: 15px 30px;
+            border-radius: 15px;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 243, 255, 0.4);
+        }
+
+        .nav-tabs .nav-link.active {
+            background: var(--card-bg);
+            border-color: var(--neon-pink);
+            color: var(--neon-yellow);
+            box-shadow: 0 0 20px var(--neon-pink);
+        }
+
+        .nav-tabs .nav-link::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink), var(--neon-green));
+            z-index: -1;
+            border-radius: inherit;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-tabs .nav-link.active::before {
+            opacity: 1;
+            animation: border-flow 3s linear infinite;
+        }
+
+        @keyframes border-flow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border: 2px solid var(--neon-blue);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+            animation: scan 3s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .card-header {
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid var(--neon-blue);
+            padding: 20px;
+        }
+
+        .card-header h5 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-yellow);
+            margin: 0;
+            text-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+            font-size: 1.4rem;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        /* Form elements */
+        .form-label {
+            color: var(--neon-blue);
+            font-weight: 500;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--neon-blue);
+            border-radius: 10px;
+            color: white;
+            padding: 15px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 15px var(--neon-pink);
+            color: white;
+            outline: none;
+        }
+
+        .form-control::placeholder {
+            color: #888;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink));
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 50px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            transition: all 0.3s;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--neon-green), var(--neon-yellow));
+            transition: all 0.6s;
+            z-index: -1;
+        }
+
+        .btn-primary:hover::before {
+            left: 0;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.7);
+            transform: translateY(-3px);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, var(--neon-green), var(--neon-yellow));
+            border: none;
+            color: black;
+            font-weight: bold;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff0040, #ff4060);
+            border: none;
+        }
+
+        .btn-outline-primary {
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+            background: transparent;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--neon-blue);
+            color: black;
+            box-shadow: 0 0 15px var(--neon-blue);
+        }
+
+        /* Career cards */
+        .career-card {
+            background: var(--card-bg);
+            border: 2px solid var(--neon-green);
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .career-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-green), var(--neon-yellow), var(--neon-blue));
+            z-index: -1;
+            border-radius: inherit;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .career-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(57, 255, 20, 0.4);
+        }
+
+        .career-card:hover::before {
+            opacity: 1;
+            animation: border-flow 3s linear infinite;
+        }
+
+        .career-title {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-yellow);
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+        }
+
+        .career-details p {
+            color: #ddd;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .career-details strong {
+            color: var(--neon-blue);
+        }
+
+        .career-details i {
+            color: var(--neon-pink);
+            margin-right: 8px;
+        }
+
+        /* Badges */
+        .badge {
+            font-family: 'Orbitron', sans-serif;
+            padding: 8px 15px;
+            border-radius: 25px;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .badge.bg-light {
+            background: var(--card-bg) !important;
+            color: var(--neon-blue) !important;
+            border: 1px solid var(--neon-blue);
+        }
+
+        .badge.bg-success {
+            background: linear-gradient(45deg, var(--neon-green), var(--neon-yellow)) !important;
+            color: black !important;
+        }
+
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--neon-blue);
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast {
+            background: var(--card-bg);
+            border: 2px solid var(--neon-green);
+            border-radius: 10px;
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.bg-success {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 15px var(--neon-green);
+        }
+
+        .toast.bg-danger {
+            border-color: #ff0040;
+            box-shadow: 0 0 15px #ff0040;
+        }
+
+        /* Skills and abilities lists */
+        .career-card ul {
+            color: #ccc;
+            padding-left: 20px;
+            flex-grow: 1;
+        }
+
+        .career-card ul li {
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+
+        .career-card ul li strong {
+            color: var(--neon-yellow);
+        }
+
+        .career-card h6 {
+            color: var(--neon-pink);
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .main-container {
+                padding-top: 100px;
+            }
+
+            .nav-tabs .nav-link {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+
+            .career-card {
+                margin-bottom: 20px;
+            }
+
+            .game-ui-corner {
+                width: 100px;
+                height: 100px;
+            }
+        }
+
+        /* Header styling */
+        .page-header {
+            text-align: center;
+            padding: 40px 0;
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.1) 0%, rgba(255, 0, 255, 0.1) 50%, rgba(57, 255, 20, 0.1) 100%);
+            position: relative;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%2300f3ff" stroke-width="0.5" opacity="0.3"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        .page-header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink), var(--neon-green));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(0, 243, 255, 0.8);
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
+            }
+            to {
+                text-shadow: 0 0 15px var(--neon-pink), 0 0 30px var(--neon-pink), 0 0 40px var(--neon-pink);
+            }
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            color: #e0e0e0;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress bar -->
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+    
+    <!-- Retro scanlines effect -->
+    <div class="scanlines"></div>
+    
+    <!-- Game UI corners -->
+    <div class="game-ui-corner corner-top-left"></div>
+    <div class="game-ui-corner corner-top-right"></div>
+    <div class="game-ui-corner corner-bottom-left"></div>
+    <div class="game-ui-corner corner-bottom-right"></div>
+
+    <!-- Animated background particles -->
+    <div class="bg-particles" id="particles"></div>
+    
+    <!-- Include Gamified Navbar Component -->
+    {% include 'gamified-navbar.html' %}
+    
+    <!-- Floating icons -->
+    <div class="floating-icon" style="top: 20%; left: 10%; animation-delay: 0s;">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#00f3ff" stroke-width="2"/>
+            <path d="M2 17L12 22L22 17" stroke="#00f3ff" stroke-width="2"/>
+            <path d="M2 12L12 17L22 12" stroke="#00f3ff" stroke-width="2"/>
+        </svg>
+    </div>
+    
+    <!-- Toast Container for Notifications -->
+    <div class="toast-container"></div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>CAREER COMMAND CENTER</h1>
+        <p>Discover your future career path with AI-powered recommendations tailored to your academic journey</p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="container">
+            <!-- Navigation Tabs -->
+            <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="predict-tab" data-bs-toggle="tab" data-bs-target="#predict-pane" type="button" role="tab">
+                        <i class="fas fa-search me-2"></i>Get Recommendations
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="saved-tab" data-bs-toggle="tab" data-bs-target="#saved-pane" type="button" role="tab">
+                        <i class="fas fa-bookmark me-2"></i>Saved Recommendations
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="mainTabContent">
+                <!-- Prediction Tab -->
+                <div class="tab-pane fade show active" id="predict-pane" role="tabpanel">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-search me-2"></i>Career Recommendation System</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="prediction-form">
+                                <div class="mb-3">
+                                    <label for="degree-program" class="form-label">Degree Program</label>
+                                    <input type="text" class="form-control" id="degree-program" required 
+                                           placeholder="Enter your degree program (e.g., Computer Science)">
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100" id="predict-btn">
+                                    <span id="predict-btn-text">Get Recommendations</span>
+                                    <span id="predict-btn-loading" class="d-none">
+                                        <span class="loading me-2"></span> Processing...
+                                    </span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Results Section -->
+                    <div id="results-section" class="d-none mt-4">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0"><i class="fas fa-list me-2"></i>Career Recommendations</h5>
+                                <div>
+                                    <span class="badge bg-light text-dark me-2" id="results-count">0 results</span>
+                                    <span class="badge bg-success d-none" id="session-badge">
+                                        <i class="fas fa-check me-1"></i> Session Saved
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="recommendations-container" class="row">
+                                    <!-- Recommendations will be inserted here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Saved Recommendations Tab -->
+                <div class="tab-pane fade" id="saved-pane" role="tabpanel">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-bookmark me-2"></i>Saved Career Recommendations</h5>
+                            <button class="btn btn-sm btn-outline-primary" id="refresh-saved">
+                                <i class="fas fa-sync-alt me-1"></i> Refresh
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div id="saved-container">
+                                <p class="text-center text-muted" id="no-saved-message">
+                                    You haven't saved any recommendations yet.
+                                </p>
+                                <!-- Saved items will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize particles background
+        function setupParticles() {
+            const particles = document.getElementById('particles');
+            if (particles) {
+                for (let i = 0; i < 50; i++) {
+                    const particle = document.createElement('div');
+                    particle.style.position = 'absolute';
+                    particle.style.width = Math.random() * 5 + 2 + 'px';
+                    particle.style.height = particle.style.width;
+                    particle.style.background = i % 3 === 0 ? '#00f3ff' : i % 3 === 1 ? '#39ff14' : '#ff00ff';
+                    particle.style.borderRadius = '50%';
+                    particle.style.opacity = Math.random() * 0.5 + 0.1;
+                    particle.style.top = Math.random() * 100 + 'vh';
+                    particle.style.left = Math.random() * 100 + 'vw';
+                    
+                    particles.appendChild(particle);
+                    animateParticle(particle);
+                }
+            }
+        }
+
+        function animateParticle(particle) {
+            const duration = Math.random() * 10 + 10;
+            
+            particle.animate([
+                { transform: 'translateY(0px)', opacity: particle.style.opacity },
+                { transform: `translateY(${Math.random() * 100 - 50}px) translateX(${Math.random() * 100 - 50}px)`, opacity: Math.random() * 0.5 }
+            ], {
+                duration: duration * 1000,
+                iterations: Infinity,
+                direction: 'alternate',
+                easing: 'ease-in-out'
+            });
+        }
+
+        // Setup scroll progress bar
+        function setupScrollProgress() {
+            window.addEventListener('scroll', () => {
+                const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const scrolled = (winScroll / height) * 100;
+                document.getElementById('progressFill').style.width = scrolled + '%';
+            });
+        }
+
+        /**
+        * @fileoverview Main script for the Career Recommendation System frontend.
+        * This file handles all client-side logic for career predictions,
+        * saving, viewing, and deleting recommendations within a single-page
+        * application using Bootstrap tabs.
+        */
+       
+        // =====================================
+        // UI Utilities Module
+        // =====================================
+        // This module handles generic UI interactions like toasts and loading states.
+        const UiUtils = (function() {
+            /**
+             * Shows a toast notification at the bottom of the page.
+             * @param {string} message - The message to display.
+             * @param {string} type - 'success' or 'danger' for styling.
+             */
+            function showToast(message, type) {
+                const toastContainer = document.querySelector('.toast-container');
+                const toast = document.createElement('div');
+                toast.classList.add('toast', 'align-items-center', 'text-white', 'border-0', 'show');
+                toast.setAttribute('role', 'alert');
+                toast.setAttribute('aria-live', 'assertive');
+                toast.setAttribute('aria-atomic', 'true');
+        
+                if (type === 'success') {
+                    toast.classList.add('bg-success');
+                } else if (type === 'danger') {
+                    toast.classList.add('bg-danger');
+                }
+        
+                toast.innerHTML = `
+                    <div class="d-flex">
+                        <div class="toast-body">${message}</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                `;
+                toastContainer.appendChild(toast);
+        
+                // Automatically hide after 5 seconds
+                setTimeout(() => toast.remove(), 5000);
+            }
+        
+            /**
+             * Toggles the loading state of a button.
+             * @param {string} btnId - The ID of the button element.
+             * @param {boolean} isLoading - True to show loading, false to hide.
+             */
+            function toggleLoadingButton(btnId, isLoading) {
+                const button = document.getElementById(btnId);
+                const textSpan = button.querySelector(`#${btnId}-text`);
+                const loadingSpan = button.querySelector(`#${btnId}-loading`);
+                if (isLoading) {
+                    textSpan.classList.add('d-none');
+                    loadingSpan.classList.remove('d-none');
+                    button.disabled = true;
+                } else {
+                    textSpan.classList.remove('d-none');
+                    loadingSpan.classList.add('d-none');
+                    button.disabled = false;
+                }
+            }
+        
+            return {
+                showToast,
+                toggleLoadingButton
+            };
+        })();
+        
+        
+        // =====================================
+        // API Service Module
+        // =====================================
+        // This module handles all API requests with authentication.
+        const ApiService = (function() {
+            /**
+             * Retrieves the JWT access token from local storage.
+             * Uses auth-utils.js functions if available, fallback to direct access.
+             * @returns {string|null} The JWT token or null if not found.
+             */
+            function getToken() {
+                // Try auth-utils function first if available
+                if (typeof getCurrentUserInfo === 'function') {
+                    const userInfo = getCurrentUserInfo();
+                    if (userInfo && !isTokenExpired()) {
+                        return localStorage.getItem('access_token');
+                    }
+                }
+                return localStorage.getItem('access_token');
+            }
+        
+            /**
+             * A generic function to make authenticated API requests.
+             * @param {string} url - The API endpoint URL.
+             * @param {string} method - The HTTP method (e.g., 'GET', 'POST', 'DELETE').
+             * @param {object} [body=null] - The request body data for POST/PUT.
+             * @returns {Promise<object>} The JSON response data from the API.
+             * @throws {Error} Throws an error if the network response is not OK.
+             */
+            async function fetchApi(url, method, body = null) {
+                const token = getToken();
+                if (!token) {
+                    UiUtils.showToast('Please log in to access this feature.', 'danger');
+                    throw new Error('User is not authenticated.');
+                }
+        
+                console.log(`Making ${method} request to ${url}`, { body });
+        
+                try {
+                    // Use authenticatedFetch if available (from auth-utils.js)
+                    let response;
+                    if (typeof authenticatedFetch === 'function') {
+                        response = await authenticatedFetch(url, {
+                            method: method,
+                            body: body ? JSON.stringify(body) : null
+                        });
+                    } else {
+                        // Fallback to manual fetch
+                        const headers = {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        };
+        
+                        const options = {
+                            method: method,
+                            headers: headers,
+                            body: body ? JSON.stringify(body) : null
+                        };
+        
+                        response = await fetch(url, options);
+                    }
+        
+                    console.log(`Response status: ${response.status}`);
+        
+                    if (!response.ok) {
+                        let errorData;
+                        try {
+                            errorData = await response.json();
+                        } catch (e) {
+                            errorData = { error: await response.text() };
+                        }
+                        console.error('API Error:', errorData);
+                        const errorMessage = errorData.detail || errorData.error || `HTTP error! Status: ${response.status}`;
+                        UiUtils.showToast(errorMessage, 'danger');
+                        throw new Error(errorMessage);
+                    }
+        
+                    // Handle successful DELETE requests with no content
+                    if (response.status === 204) {
+                        return {};
+                    }
+        
+                    return response.json();
+                } catch (error) {
+                    console.error('fetchApi error:', error);
+                    throw error;
+                }
+            }
+        
+            return {
+                fetchApi
+            };
+        })();
+        
+        // =====================================
+        // Career Actions & UI Renderer Module
+        // =====================================
+        // This module combines business logic and UI rendering for careers.
+        const CareerModule = (function() {
+        
+            // --- Private Helper Functions ---
+        
+            /**
+             * Helper function to generate HTML for skills or abilities.
+             * @param {string} title - The title for the section (e.g., 'Skills').
+             * @param {Array<object>} items - The array of skill or ability objects.
+             * @returns {string} The HTML string for the list or an empty string.
+             */
+            function renderSkillsOrAbilities(title, items) {
+                if (!items || !Array.isArray(items) || items.length === 0) {
+                    return '';
+                }
+                const listItems = items.map(item => `
+                    <li>${item['Element Name'] || item['Element_Name'] || item.name}: <strong>${item['Data Value'] ? item['Data Value'].toFixed(2) : (item['Data_Value'] ? item['Data_Value'].toFixed(2) : 'N/A')}</strong></li>
+                `).join('');
+                return `
+                    <div class="mt-3">
+                        <h6 class="mb-1">${title}:</h6>
+                        <ul>${listItems}</ul>
+                    </div>
+                `;
+            }
+        
+            /**
+             * Renders a single recommendation card.
+             * @param {object} rec - The recommendation data.
+             * @param {string} sessionId - The current session ID.
+             * @returns {string} The HTML string for the card.
+             */
+            function renderRecommendationCard(rec, sessionId) {
+                return `
+                    <div class="col-lg-6 mb-4">
+                        <div class="career-card">
+                            <h5 class="career-title">${rec.title || 'Career Title'}</h5>
+                            <div class="career-details">
+                                <p><strong><i class="fas fa-briefcase"></i> Linked Occupation:</strong> ${rec.occupation || 'N/A'}</p>
+                                <p><strong><i class="fas fa-chart-line"></i> Vacancies:</strong> ${rec.vacancies || 'N/A'}</p>
+                                <p><strong><i class="fas fa-star-half-alt"></i> Combined Score:</strong> ${rec.combined_score ? rec.combined_score.toFixed(4) : 'N/A'}</p>
+                                <p><strong><i class="fas fa-percent"></i> Similarity:</strong> ${rec.similarity_score ? (rec.similarity_score * 100).toFixed(2) + '%' : 'N/A'}</p>
+                            </div>
+                            ${renderSkillsOrAbilities('Skills', rec.skills)}
+                            ${renderSkillsOrAbilities('Abilities', rec.abilities)}
+                            <button class="btn btn-primary mt-3 save-button" 
+                                data-career-code="${rec.career_code}" 
+                                data-career-title="${rec.title}" 
+                                data-session-id="${sessionId}" 
+                                data-match-score="${rec.combined_score}">
+                                <i class="fas fa-bookmark me-2"></i>Save Career
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        
+            /**
+             * Renders a single saved prediction card.
+             * @param {object} pred - The saved prediction data.
+             * @returns {string} The HTML string for the card.
+             */
+            function renderSavedPredictionCard(pred) {
+                return `
+                    <div class="col-lg-6 mb-4" data-prediction-id="${pred.id}">
+                        <div class="career-card">
+                            <h5 class="career-title">${pred.career_title}</h5>
+                            <div class="career-details">
+                                <p><strong><i class="fas fa-code"></i> Code:</strong> ${pred.career_code}</p>
+                                <p><strong><i class="fas fa-star"></i> Match Score:</strong> ${pred.match_score ? pred.match_score.toFixed(4) : 'N/A'}</p>
+                                <p><strong><i class="fas fa-calendar-check"></i> Saved On:</strong> ${new Date(pred.saved_at).toLocaleDateString()}</p>
+                                <p><strong><i class="fas fa-sticky-note"></i> Notes:</strong> ${pred.notes || 'No notes'}</p>
+                            </div>
+                            <button class="btn btn-danger mt-3 delete-button" data-prediction-id="${pred.id}">
+                                <i class="fas fa-trash-alt me-2"></i>Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        
+            // --- Public Functions ---
+        
+            /**
+             * Handles the career prediction process.
+             * This function initiates a new career session on the backend and renders the results.
+             * @param {Event} event - The form submission event.
+             */
+            async function getRecommendations(event) {
+                event.preventDefault();
+        
+                const degreeProgram = document.getElementById('degree-program').value.trim();
+                if (!degreeProgram) {
+                    UiUtils.showToast('Please enter a degree program.', 'danger');
+                    return;
+                }
+        
+                UiUtils.toggleLoadingButton('predict-btn', true);
+                document.getElementById('results-section').classList.add('d-none');
+        
+                try {
+                    const data = await ApiService.fetchApi('/api/recommendations/', 'POST', {
+                        degree_program: degreeProgram,
+                        save_session: true
+                    });
+        
+                    // Update UI with results
+                    const container = document.getElementById('recommendations-container');
+                    container.innerHTML = '';
+                    data.recommendations.forEach(rec => {
+                        container.innerHTML += renderRecommendationCard(rec, data.session_id);
+                    });
+        
+                    // Update result count and show section
+                    document.getElementById('results-count').textContent = `${data.total_predictions} results`;
+                    document.getElementById('results-section').classList.remove('d-none');
+                    document.getElementById('session-badge').classList.remove('d-none');
+        
+                    // Attach event listeners to the new "Save" buttons
+                    document.querySelectorAll('.save-button').forEach(button => {
+                        button.addEventListener('click', saveCareerPrediction);
+                    });
+        
+                } catch (error) {
+                    // Error handling is done inside ApiService.fetchApi
+                } finally {
+                    UiUtils.toggleLoadingButton('predict-btn', false);
+                }
+            }
+        
+            /**
+             * Saves a single career prediction.
+             * @param {Event} event - The click event from the save button.
+             */
+            async function saveCareerPrediction(event) {
+                const button = event.target;
+                const { careerCode, careerTitle, sessionId, matchScore } = button.dataset;
+        
+                console.log('Save button data:', { careerCode, careerTitle, sessionId, matchScore });
+        
+                button.disabled = true;
+                button.innerHTML = '<span class="loading me-2"></span>Saving...';
+        
+                const payload = {
+                    career_code: careerCode,
+                    career_title: careerTitle,
+                    match_score: parseFloat(matchScore),
+                    session_id: parseInt(sessionId),
+                    recommended_level: 'Recommended',
+                    notes: 'Saved from career prediction system'
+                };
+                
+                console.log('Sending payload:', payload);
+        
+                try {
+                    const result = await ApiService.fetchApi('/api/career-predictions/', 'POST', payload);
+                    console.log('Save result:', result);
+        
+                    button.innerHTML = '<i class="fas fa-check me-2"></i>Saved!';
+                    button.classList.remove('btn-primary');
+                    button.classList.add('btn-success');
+                    UiUtils.showToast('Career saved successfully!', 'success');
+                } catch (error) {
+                    console.error('Save career error:', error);
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-bookmark me-2"></i>Save Career';
+                    // Error handling is done inside ApiService.fetchApi
+                }
+            }
+        
+            /**
+             * Fetches and displays a user's saved career predictions.
+             */
+            async function fetchAndDisplaySavedCareers() {
+                const listContainer = document.getElementById('saved-container');
+                if (!listContainer) return;
+        
+                const noSavedMessage = document.getElementById('no-saved-message');
+                
+                // Show loading state
+                listContainer.innerHTML = '<p class="text-center text-muted">Loading saved careers...</p>';
+                if (noSavedMessage) {
+                    noSavedMessage.classList.add('d-none');
+                }
+        
+                try {
+                    const savedPredictions = await ApiService.fetchApi('/api/career-predictions/', 'GET');
+                    
+                    // Clear the loading message
+                    listContainer.innerHTML = '';
+                    
+                    if (!savedPredictions || savedPredictions.length === 0) {
+                        listContainer.innerHTML = `
+                            <p class="text-center text-muted" id="no-saved-message">
+                                You haven't saved any recommendations yet.
+                            </p>`;
+                    } else {
+                        listContainer.innerHTML = '<div class="row"></div>';
+                        const rowContainer = listContainer.querySelector('.row');
+                        savedPredictions.forEach(pred => {
+                            rowContainer.innerHTML += renderSavedPredictionCard(pred);
+                        });
+                        // Attach event listeners to the new "Delete" buttons
+                        document.querySelectorAll('.delete-button').forEach(button => {
+                            button.addEventListener('click', deleteSavedPrediction);
+                        });
+                    }
+                } catch (error) {
+                    listContainer.innerHTML = ''; // Clear loading message
+                    // Error handling is done inside ApiService.fetchApi
+                }
+            }
+        
+            /**
+             * Soft-deletes a saved career prediction.
+             * @param {Event} event - The click event from the delete button.
+             */
+            async function deleteSavedPrediction(event) {
+                const button = event.target;
+                const predictionId = button.dataset.predictionId;
+        
+                if (!confirm('Are you sure you want to delete this career prediction?')) {
+                    return;
+                }
+        
+                try {
+                    await ApiService.fetchApi(`/api/career-predictions/${predictionId}/`, 'DELETE');
+                    UiUtils.showToast('Career prediction deleted successfully!', 'success');
+                    button.closest('.col-lg-6').remove();
+                } catch (error) {
+                    // Error handling is done inside ApiService.fetchApi
+                }
+            }
+        
+            return {
+                getRecommendations,
+                saveCareerPrediction,
+                fetchAndDisplaySavedCareers,
+                deleteSavedPrediction
+            };
+        })();
+        
+        // =====================================
+        // Initialization
+        // =====================================
+        // This section sets up the main event listeners for the page.
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize visual effects
+            setupParticles();
+            setupScrollProgress();
+
+            // Event listener for the form submission
+            const form = document.getElementById('prediction-form');
+            if (form) {
+                form.addEventListener('submit', CareerModule.getRecommendations);
+            }
+        
+            // Event listener for the "Saved Recommendations" tab
+            const savedTab = document.getElementById('saved-tab');
+            if (savedTab) {
+                savedTab.addEventListener('shown.bs.tab', CareerModule.fetchAndDisplaySavedCareers);
+            }
+        
+            // Event listener for the "Refresh" button on the saved tab
+            const refreshBtn = document.getElementById('refresh-saved');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', CareerModule.fetchAndDisplaySavedCareers);
+            }
+
+            // Initialize Bootstrap tabs
+            var triggerTabList = [].slice.call(document.querySelectorAll('#mainTabs button'));
+            triggerTabList.forEach(function(triggerEl) {
+                var tabTrigger = new bootstrap.Tab(triggerEl);
+                
+                // Add click event listener
+                triggerEl.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    tabTrigger.show();
+                    
+                    // If clicking the saved tab, load saved recommendations
+                    if (triggerEl.id === 'saved-tab') {
+                        CareerModule.fetchAndDisplaySavedCareers();
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="{% static 'js/authentication.js' %}"></script>
+</body>
+</html>
+   

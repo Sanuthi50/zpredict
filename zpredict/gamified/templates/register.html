@@ -1,0 +1,1055 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Terminal - Zpredict</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Game-inspired styles matching home page */
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ff;
+            --neon-green: #39ff14;
+            --neon-yellow: #ffff00;
+            --dark-bg: #0a1a3b;
+            --darker-bg: #050b1f;
+            --card-bg: rgba(16, 18, 37, 0.9);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--darker-bg) 0%, var(--dark-bg) 70%);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            background-attachment: fixed;
+            min-height: 100vh;
+            cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><rect x='0' y='0' width='4' height='4' fill='%2300f3ff'/><rect x='4' y='4' width='4' height='4' fill='%2300f3ff'/><rect x='8' y='8' width='4' height='4' fill='%2300f3ff'/><rect x='12' y='12' width='4' height='4' fill='%2300f3ff'/></svg>") 8 8, auto;
+        }
+        
+        /* Progress bar */
+        .progress-bar {
+            height: 5px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1001;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink), var(--neon-green), var(--neon-yellow));
+            transition: width 0.5s ease;
+            position: relative;
+            border-radius: inherit;
+        }
+        
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Retro scanlines effect */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0.03) 50%,
+                rgba(0, 0, 0, 0.1) 50%
+            );
+            background-size: 100% 4px;
+            z-index: 99;
+            pointer-events: none;
+            opacity: 0.2;
+        }
+        
+        /* Game UI corners */
+        .game-ui-corner {
+            position: fixed;
+            width: 150px;
+            height: 150px;
+            z-index: 5;
+            pointer-events: none;
+        }
+        
+        .corner-top-left {
+            top: 0;
+            left: 0;
+            border-top: 4px solid var(--neon-blue);
+            border-left: 4px solid var(--neon-blue);
+        }
+        
+        .corner-top-right {
+            top: 0;
+            right: 0;
+            border-top: 4px solid var(--neon-pink);
+            border-right: 4px solid var(--neon-pink);
+        }
+        
+        .corner-bottom-left {
+            bottom: 0;
+            left: 0;
+            border-bottom: 4px solid var(--neon-green);
+            border-left: 4px solid var(--neon-green);
+        }
+        
+        .corner-bottom-right {
+            bottom: 0;
+            right: 0;
+            border-bottom: 4px solid var(--neon-yellow);
+            border-right: 4px solid var(--neon-yellow);
+        }
+        
+        /* Main container */
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 80px);
+            padding: 40px 20px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .registration-terminal {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            box-shadow: 0 20px 40px rgba(0, 243, 255, 0.2);
+        }
+        
+        .registration-terminal::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink), var(--neon-green));
+            z-index: -1;
+            border-radius: inherit;
+            animation: border-flow 3s linear infinite;
+        }
+        
+        @keyframes border-flow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M 8 0 L 0 0 0 8" fill="none" stroke="%2300f3ff" stroke-width="0.3" opacity="0.2"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+            z-index: -1;
+            border-radius: 10px;
+        }
+        
+        .title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, var(--neon-green), var(--neon-yellow));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(57, 255, 20, 0.8);
+            animation: glow 3s ease-in-out infinite alternate;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green);
+            }
+            to {
+                text-shadow: 0 0 15px var(--neon-yellow), 0 0 30px var(--neon-yellow);
+            }
+        }
+        
+        .subtitle {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            color: var(--neon-blue);
+            text-shadow: 2px 2px 0 #000;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+        
+        .terminal-text {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.5rem;
+            color: var(--neon-pink);
+            margin-bottom: 25px;
+            text-align: left;
+            line-height: 1.8;
+        }
+        
+        .cursor {
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        /* Form styles */
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .input-container {
+            position: relative;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            border: 2px solid var(--neon-blue);
+            padding: 2px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .input-container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink), var(--neon-green), var(--neon-yellow));
+            z-index: -1;
+            border-radius: inherit;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .input-container:hover::before,
+        .input-container:focus-within::before {
+            opacity: 1;
+            animation: border-glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes border-glow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(90deg); }
+        }
+        
+        .input-container:hover,
+        .input-container:focus-within {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 22px;
+            height: 22px;
+            z-index: 2;
+        }
+        
+        .input-icon img {
+            width: 100%;
+            height: 100%;
+            filter: brightness(0) saturate(100%) invert(62%) sepia(96%) saturate(2592%) hue-rotate(175deg) brightness(103%) contrast(101%);
+            transition: all 0.3s ease;
+        }
+        
+        .input-container:focus-within .input-icon img {
+            filter: brightness(0) saturate(100%) invert(85%) sepia(89%) saturate(2287%) hue-rotate(296deg) brightness(104%) contrast(101%);
+            transform: scale(1.2);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 15px 15px 15px 55px;
+            background: transparent;
+            border: none;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus::placeholder {
+            color: var(--neon-yellow);
+            transform: translateX(5px);
+        }
+        
+        .form-input:focus {
+            text-shadow: 0 0 5px var(--neon-blue);
+        }
+        
+        /* Field validation indicators */
+        .form-group.valid .input-container {
+            border-color: var(--neon-green);
+        }
+        
+        .form-group.valid .input-icon::after {
+            content: '✓';
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--neon-green);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        /* Submit button */
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(45deg, var(--neon-green), var(--neon-yellow));
+            border: none;
+            padding: 18px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            transition: all 0.3s;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+        
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink));
+            transition: all 0.6s;
+            z-index: -1;
+        }
+        
+        .submit-btn:hover::before {
+            left: 0;
+        }
+        
+        .submit-btn:hover {
+            box-shadow: 0 0 30px rgba(57, 255, 20, 0.7);
+            transform: translateY(-3px);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading-animation {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Login prompt */
+        .login-prompt {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #ccc;
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 20px;
+        }
+        
+        .login-link {
+            color: var(--neon-blue);
+            text-decoration: none;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .login-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--neon-pink);
+            transition: width 0.3s;
+        }
+        
+        .login-link:hover {
+            color: var(--neon-pink);
+            text-shadow: 0 0 5px var(--neon-pink);
+        }
+        
+        .login-link:hover::after {
+            width: 100%;
+        }
+        
+        /* Status messages */
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .status::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .status.success {
+            background: rgba(57, 255, 20, 0.2);
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
+        }
+        
+        .status.success::before {
+            left: 100%;
+        }
+        
+        .status.error {
+            background: rgba(255, 0, 100, 0.2);
+            border: 2px solid #ff0064;
+            color: #ff0064;
+            box-shadow: 0 0 15px rgba(255, 0, 100, 0.3);
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
+            20%, 40%, 60%, 80% { transform: translateX(3px); }
+        }
+        
+        /* Floating particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float-particle 20s linear infinite;
+        }
+        
+        @keyframes float-particle {
+            0% {
+                transform: translateY(100vh) rotate(0deg) scale(0);
+                opacity: 0;
+            }
+            5% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+            95% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg) scale(0);
+                opacity: 0;
+            }
+        }
+        
+        /* Progress indicators */
+        .progress-indicator {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+        }
+        
+        .step-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .step-indicator.completed {
+            background: var(--neon-green);
+            border-color: var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+        
+        .step-indicator.current {
+            background: var(--neon-yellow);
+            border-color: var(--neon-yellow);
+            box-shadow: 0 0 15px var(--neon-yellow);
+            animation: pulse-step 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-step {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .registration-terminal {
+                margin: 20px;
+                padding: 30px 25px;
+                max-width: none;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 0.5rem;
+            }
+            
+            .game-ui-corner {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .progress-indicator {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Retro scanlines effect -->
+    <div class="scanlines"></div>
+    
+    <!-- Game UI corners -->
+    <div class="game-ui-corner corner-top-left"></div>
+    <div class="game-ui-corner corner-top-right"></div>
+    <div class="game-ui-corner corner-bottom-left"></div>
+    <div class="game-ui-corner corner-bottom-right"></div>
+    
+    <!-- Particles container -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- Progress indicators -->
+    <div class="progress-indicator">
+        <div class="step-indicator" id="step1"></div>
+        <div class="step-indicator" id="step2"></div>
+        <div class="step-indicator" id="step3"></div>
+        <div class="step-indicator" id="step4"></div>
+    </div>
+     
+    <!-- Include Gamified Navbar Component -->
+    {% include 'gamified-navbar.html' %}
+    
+    <!-- Progress bar -->
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+     
+    <div class="main-container">               
+        <div class="registration-terminal">
+            <!-- Terminal header -->
+            <div class="header">
+                <div class="terminal-text">
+                    > INITIATING USER REGISTRATION PROTOCOL...<br>
+                    > SCANNING FOR AVAILABLE SLOTS: <span style="color: var(--neon-green);">FOUND</span><br>
+                    > SYSTEM STATUS: <span style="color: var(--neon-yellow);">READY</span><span class="cursor">|</span>
+                </div>
+                <h1 class="title">New User Registration</h1>
+                <p class="subtitle">Join the ZPredict Academy</p>
+            </div>
+            
+            <form id="registerForm">
+                <div class="form-group" data-step="1">
+                    <div class="input-container">
+                        <div class="input-icon">
+                            <img src="{% static 'images/user.png' %}" alt="User Icon">
+                        </div>
+                        <input type="text" id="first_name" class="form-input" placeholder="First Name" required>
+                    </div>
+                </div>
+                
+                <div class="form-group" data-step="2">
+                    <div class="input-container">
+                        <div class="input-icon">
+                            <img src="{% static 'images/user.png' %}" alt="User Icon">
+                        </div>
+                        <input type="text" id="last_name" class="form-input" placeholder="Last Name" required>
+                    </div>
+                </div>
+                
+                <div class="form-group" data-step="3">
+                    <div class="input-container">
+                        <div class="input-icon">
+                            <img src="{% static 'images/communication.png' %}" alt="Email Icon">
+                        </div>
+                        <input type="email" id="email" class="form-input" placeholder="Email Address" required>
+                    </div>
+                </div>
+                
+                <div class="form-group" data-step="4">
+                    <div class="input-container">
+                        <div class="input-icon">
+                            <img src="{% static 'images/password.png' %}" alt="Password Icon">
+                        </div>
+                        <input type="password" id="password" class="form-input" placeholder="Create Access Code" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    Initialize User Profile
+                </button>
+                
+                <p class="login-prompt">Already have clearance? <a href="http://127.0.0.1:8000/gamified/login/" class="login-link">Access Terminal</a></p>
+            </form>
+            
+            <div class="status" id="status"></div>
+        </div>
+    </div>
+
+    <script>
+        // Registration Page Manager with gamified effects
+        class RegistrationPageManager {
+            constructor() {
+                this.currentStep = 1;
+                this.totalSteps = 4;
+                this.init();
+            }
+        
+            init() {
+                this.setupParticles();
+                this.setupForm();
+                this.setupInputEffects();
+                this.setupProgressTracking();
+                this.setupValidation();
+            }
+        
+            // Create particle background effect
+            setupParticles() {
+                const particlesContainer = document.getElementById('particles');
+                const colors = ['#6C63FF', '#FF6B8B', '#36D6C3', '#FFC75F'];
+                
+                for (let i = 0; i < 30; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    
+                    const size = Math.random() * 12 + 4;
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.background = color;
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.animationDuration = `${Math.random() * 15 + 10}s`;
+                    particle.style.animationDelay = `${Math.random() * 8}s`;
+                    
+                    particlesContainer.appendChild(particle);
+                }
+            }
+        
+            // Setup progress tracking
+            setupProgressTracking() {
+                const inputs = document.querySelectorAll('.form-input');
+                const progressFill = document.getElementById('progressFill');
+                
+                const updateProgress = () => {
+                    const filledInputs = Array.from(inputs).filter(input => input.value.trim() !== '');
+                    const progress = (filledInputs.length / inputs.length) * 100;
+                    
+                    if (progressFill) {
+                        progressFill.style.width = progress + '%';
+                    }
+                    
+                    // Update step indicators
+                    this.updateStepIndicators(filledInputs.length);
+                };
+                
+                inputs.forEach((input, index) => {
+                    input.addEventListener('input', () => {
+                        updateProgress();
+                        this.validateField(input);
+                        
+                        // Add typing effect
+                        input.style.textShadow = '0 0 8px var(--neon-blue)';
+                        setTimeout(() => {
+                            input.style.textShadow = 'none';
+                        }, 150);
+                    });
+                });
+                
+                // Initial progress update
+                updateProgress();
+            }
+        
+            // Update step indicators
+            updateStepIndicators(completedSteps) {
+                for (let i = 1; i <= this.totalSteps; i++) {
+                    const indicator = document.getElementById(`step${i}`);
+                    if (indicator) {
+                        indicator.classList.remove('completed', 'current');
+                        
+                        if (i <= completedSteps) {
+                            indicator.classList.add('completed');
+                        } else if (i === completedSteps + 1) {
+                            indicator.classList.add('current');
+                        }
+                    }
+                }
+            }
+        
+            // Setup input field effects
+            setupInputEffects() {
+                const inputs = document.querySelectorAll('.form-input');
+                
+                inputs.forEach(input => {
+                    input.addEventListener('focus', () => {
+                        const container = input.closest('.input-container');
+                        container.style.transform = 'scale(1.02) translateY(-2px)';
+                        
+                        // Add focus glow effect
+                        setTimeout(() => {
+                            container.style.boxShadow = '0 0 25px rgba(0, 243, 255, 0.4)';
+                        }, 100);
+                    });
+                    
+                    input.addEventListener('blur', () => {
+                        const container = input.closest('.input-container');
+                        container.style.transform = 'scale(1) translateY(0)';
+                        container.style.boxShadow = '';
+                    });
+                });
+            }
+        
+            // Field validation
+            validateField(input) {
+                const formGroup = input.closest('.form-group');
+                const value = input.value.trim();
+                
+                if (value && this.isValidField(input)) {
+                    formGroup.classList.add('valid');
+                    this.createValidationParticles(input);
+                } else {
+                    formGroup.classList.remove('valid');
+                }
+            }
+        
+            // Check if field is valid
+            isValidField(input) {
+                const value = input.value.trim();
+                const type = input.type;
+                
+                switch (type) {
+                    case 'email':
+                        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+                    case 'password':
+                        return value.length >= 6;
+                    default:
+                        return value.length >= 2;
+                }
+            }
+        
+            // Create validation particles
+            createValidationParticles(input) {
+                const container = input.closest('.input-container');
+                const rect = container.getBoundingClientRect();
+                
+                for (let i = 0; i < 3; i++) {
+                    const particle = document.createElement('div');
+                    particle.style.position = 'fixed';
+                    particle.style.width = '6px';
+                    particle.style.height = '6px';
+                    particle.style.backgroundColor = 'var(--neon-green)';
+                    particle.style.borderRadius = '50%';
+                    particle.style.left = rect.right + 'px';
+                    particle.style.top = (rect.top + rect.height / 2) + 'px';
+                    particle.style.pointerEvents = 'none';
+                    particle.style.zIndex = '1000';
+                    
+                    document.body.appendChild(particle);
+                    
+                    const angle = (Math.PI * 2 * i) / 3;
+                    const distance = 30 + Math.random() * 20;
+                    
+                    particle.animate([
+                        { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                        { 
+                            transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(0)`,
+                            opacity: 0
+                        }
+                    ], {
+                        duration: 800,
+                        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                    }).onfinish = () => particle.remove();
+                }
+            }
+        
+            // Setup form functionality
+            setupForm() {
+                const form = document.getElementById('registerForm');
+                if (!form) {
+                    console.error("Form with ID 'registerForm' not found!");
+                    return;
+                }
+                
+                const statusDiv = document.getElementById('status');
+                const submitBtn = document.getElementById('submitBtn');
+                
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const first_name = document.getElementById('first_name').value;
+                    const last_name = document.getElementById('last_name').value;
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    
+                    // Enhanced button loading state
+                    if (submitBtn) {
+                        submitBtn.innerHTML = 'Registering User... <span class="loading-animation"></span>';
+                        submitBtn.disabled = true;
+                    }
+                    
+                    // Add registration effect
+                    if (statusDiv) {
+                        statusDiv.innerHTML = '<span style="color: var(--neon-yellow);">Processing registration data...</span>';
+                        statusDiv.className = 'status';
+                    }
+                    
+                    try {
+                        const response = await fetch('http://127.0.0.1:8000/api/register/', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ first_name, last_name, email, password })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (response.ok) {
+                            if (statusDiv) {
+                                statusDiv.className = 'status success';
+                                statusDiv.innerHTML = 'REGISTRATION COMPLETE! Redirecting to access terminal...';
+                            }
+                            
+                            // Add success particle burst
+                            this.createSuccessParticleBurst();
+                            
+                            setTimeout(() => {
+                                window.location.href = "http://127.0.0.1:8000/gamified/login/";
+                            }, 1500);
+                        } else {
+                            if (statusDiv) {
+                                statusDiv.className = 'status error';
+                                statusDiv.innerHTML = 'REGISTRATION FAILED: ' + (data.detail || 'Try again!');
+                            }
+                            
+                            // Add error shake effect
+                            document.querySelector('.registration-terminal').style.animation = 'shake 0.5s';
+                            setTimeout(() => {
+                                document.querySelector('.registration-terminal').style.animation = '';
+                            }, 500);
+                        }
+                    } catch (err) {
+                        if (statusDiv) {
+                            statusDiv.className = 'status error';
+                            statusDiv.innerHTML = 'CONNECTION ERROR: ' + err.message;
+                        }
+                    } finally {
+                        if (submitBtn) {
+                            submitBtn.innerHTML = 'Initialize User Profile';
+                            submitBtn.disabled = false;
+                        }
+                    }
+                });
+            }
+        
+            // Setup validation
+            setupValidation() {
+                const inputs = document.querySelectorAll('.form-input');
+                
+                inputs.forEach(input => {
+                    // Real-time validation
+                    input.addEventListener('blur', () => {
+                        this.validateField(input);
+                    });
+                    
+                    // Password strength indicator
+                    if (input.type === 'password') {
+                        input.addEventListener('input', () => {
+                            this.updatePasswordStrength(input);
+                        });
+                    }
+                });
+            }
+        
+            // Update password strength indicator
+            updatePasswordStrength(passwordInput) {
+                const password = passwordInput.value;
+                const container = passwordInput.closest('.input-container');
+                
+                let strength = 0;
+                if (password.length >= 6) strength++;
+                if (password.match(/[a-z]/)) strength++;
+                if (password.match(/[A-Z]/)) strength++;
+                if (password.match(/[0-9]/)) strength++;
+                if (password.match(/[^a-zA-Z0-9]/)) strength++;
+                
+                // Remove existing strength indicator
+                const existingIndicator = container.querySelector('.strength-indicator');
+                if (existingIndicator) {
+                    existingIndicator.remove();
+                }
+                
+                if (password.length > 0) {
+                    const indicator = document.createElement('div');
+                    indicator.className = 'strength-indicator';
+                    indicator.style.position = 'absolute';
+                    indicator.style.bottom = '-8px';
+                    indicator.style.left = '15px';
+                    indicator.style.right = '15px';
+                    indicator.style.height = '3px';
+                    indicator.style.borderRadius = '2px';
+                    indicator.style.transition = 'all 0.3s ease';
+                    
+                    const colors = ['#ff0064', '#ff6b00', '#ffc107', '#28a745', '#00f3ff'];
+                    const widths = [20, 40, 60, 80, 100];
+                    
+                    indicator.style.background = colors[Math.min(strength - 1, 4)];
+                    indicator.style.width = widths[Math.min(strength - 1, 4)] + '%';
+                    
+                    container.appendChild(indicator);
+                }
+            }
+        
+            // Create success particle burst
+            createSuccessParticleBurst() {
+                const colors = ['var(--neon-blue)', 'var(--neon-pink)', 'var(--neon-green)', 'var(--neon-yellow)'];
+                const container = document.querySelector('.registration-terminal');
+                const rect = container.getBoundingClientRect();
+                
+                for (let i = 0; i < 20; i++) {
+                    const particle = document.createElement('div');
+                    particle.style.position = 'fixed';
+                    particle.style.width = '10px';
+                    particle.style.height = '10px';
+                    particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    particle.style.borderRadius = '50%';
+                    particle.style.left = (rect.left + rect.width / 2) + 'px';
+                    particle.style.top = (rect.top + rect.height / 2) + 'px';
+                    particle.style.pointerEvents = 'none';
+                    particle.style.zIndex = '1000';
+                    
+                    document.body.appendChild(particle);
+                    
+                    const angle = (Math.PI * 2 * i) / 20;
+                    const velocity = 150 + Math.random() * 100;
+                    
+                    particle.animate([
+                        { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+                        { 
+                            transform: `translate(${Math.cos(angle) * velocity - 50}%, ${Math.sin(angle) * velocity - 50}%) scale(0)`,
+                            opacity: 0
+                        }
+                    ], {
+                        duration: 1500,
+                        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                    }).onfinish = () => particle.remove();
+                }
+            }
+        }
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new RegistrationPageManager();
+        });
+    </script>
+</body>
+</html>

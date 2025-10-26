@@ -1,0 +1,1123 @@
+{% load static %}
+<!DOCTYPE html>
+<!-- GAMIFIED STUDENT PROFILE TEMPLATE -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Profile - Zpredict</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{% static 'css/studentprofile.css' %}" rel="stylesheet">
+    <style>
+        /* Game-inspired styles */
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ff;
+            --neon-green: #39ff14;
+            --neon-yellow: #ffff00;
+            --dark-bg: #0a1a3b; /* Changed to dark blue */
+            --darker-bg: #050b1f; /* Darker blue for gradient */
+            --card-bg: rgba(16, 18, 37, 0.8);
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--darker-bg) 0%, var(--dark-bg) 70%);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            background-attachment: fixed;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Pixelated elements */
+        .pixel-border {
+            border: 4px solid var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue), inset 0 0 10px rgba(0, 243, 255, 0.2);
+            position: relative;
+        }
+        
+        .pixel-border::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            border: 2px solid var(--neon-pink);
+            pointer-events: none;
+        }
+        
+        /* 8-bit inspired text */
+        .bit-text {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+            letter-spacing: 1px;
+        }
+        
+        .bit-text-sm {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+        }
+        
+        /* Futuristic text */
+        .futuristic-text {
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        /* Main container styling */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 20px 20px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* Page header styling */
+        .page-header {
+            text-align: center;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 10;
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.1) 0%, rgba(255, 0, 255, 0.1) 50%, rgba(57, 255, 20, 0.1) 100%);
+            overflow: hidden;
+            border-radius: 20px;
+            margin: 20px 0 40px 0;
+        }
+        
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%2300f3ff" stroke-width="0.5" opacity="0.3"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+            z-index: -1;
+        }
+        
+        .page-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink), var(--neon-green));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(0, 243, 255, 0.8);
+            animation: glow 3s ease-in-out infinite alternate;
+            position: relative;
+        }
+        
+        .page-title::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink), var(--neon-green));
+            opacity: 0.2;
+            filter: blur(20px);
+            z-index: -1;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.2; }
+            50% { transform: scale(1.05); opacity: 0.4; }
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
+            }
+            to {
+                text-shadow: 0 0 15px var(--neon-pink), 0 0 30px var(--neon-pink), 0 0 40px var(--neon-pink);
+            }
+        }
+        
+        .page-subtitle {
+            font-size: 1.2rem;
+            color: #e0e0e0;
+            line-height: 1.6;
+            font-weight: 300;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Profile sections styling */
+        .profile-sections {
+            display: grid;
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .profile-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            transition: all 0.4s ease;
+        }
+        
+        .profile-section::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: rgba(0, 243, 255, 0.3);
+            z-index: -1;
+            border-radius: inherit;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        @keyframes border-flow {
+            0% {
+                filter: hue-rotate(0deg);
+            }
+            100% {
+                filter: hue-rotate(360deg);
+            }
+        }
+        
+        .profile-section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 243, 255, 0.2);
+        }
+
+        .profile-section:hover::before {
+            opacity: 1;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--neon-blue);
+        }
+        
+        .section-header h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-blue);
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+            margin: 0;
+        }
+        
+        .edit-btn, .add-btn {
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink));
+            border: none;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            transition: all 0.3s;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .edit-btn::before, .add-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+            z-index: -1;
+            opacity: 0;
+        }
+
+        .edit-btn:hover::before, .add-btn:hover::before {
+            opacity: 1;
+        }
+        
+        .edit-btn:hover, .add-btn:hover {
+            box-shadow: 0 4px 15px rgba(0, 243, 255, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        /* Form styling */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--neon-blue);
+            font-weight: 500;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--neon-blue);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            box-shadow: 0 0 10px var(--neon-blue);
+            border-color: var(--neon-pink);
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .form-group input:hover, .form-group textarea:hover, .form-group select:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+            color: white;
+        }
+
+        .form-group input::placeholder, .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-group select option {
+            background: rgba(10, 26, 59, 0.95);
+            color: white;
+            padding: 8px;
+        }
+
+        .form-group select option:hover {
+            background: var(--neon-blue);
+            color: white;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, var(--neon-green), var(--neon-yellow));
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink));
+            color: white;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(45deg, #ff4757, #ff3838);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            filter: brightness(1.1);
+        }
+        
+        /* Info grid styling */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .info-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--neon-green);
+        }
+        
+        .info-item label {
+            display: block;
+            color: var(--neon-blue);
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+        
+        .info-item span {
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Actions grid styling */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .action-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--neon-blue);
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: rgba(0, 243, 255, 0.2);
+            z-index: -1;
+            border-radius: inherit;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .action-btn:hover::before {
+            opacity: 1;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 243, 255, 0.2);
+        }
+        
+        .action-icon {
+            font-size: 2.5rem;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .action-text h3 {
+            color: var(--neon-blue);
+            margin: 0 0 8px 0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        .action-text p {
+            color: #e0e0e0;
+            margin: 0;
+            font-size: 0.9rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Danger zone styling */
+        .danger-zone {
+            border-color: #ff4757 !important;
+        }
+        
+        .danger-zone::before {
+            background: linear-gradient(45deg, #ff4757, #ff3838) !important;
+        }
+        
+        .danger-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 71, 87, 0.1);
+            border-radius: 10px;
+            border: 1px solid #ff4757;
+            margin-bottom: 15px;
+        }
+        
+        .danger-info h3 {
+            color: #ff4757;
+            margin: 0 0 8px 0;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .danger-info p {
+            color: #e0e0e0;
+            margin: 0;
+            font-size: 0.9rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: var(--card-bg);
+            margin: 15% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.5);
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 2px solid var(--neon-blue);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            color: var(--neon-blue);
+            margin: 0;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--neon-blue);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .modal-close:hover {
+            color: var(--neon-pink);
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-body p {
+            color: #ffffff;
+            margin: 0;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-footer {
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+        
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+            z-index: 1001;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        /* Loading spinner */
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--neon-blue);
+            border-top: 4px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Game UI corners */
+        .game-ui-corner {
+            position: fixed;
+            width: 150px;
+            height: 150px;
+            z-index: 5;
+            pointer-events: none;
+        }
+        
+        .corner-top-left {
+            top: 0;
+            left: 0;
+            border-top: 4px solid var(--neon-blue);
+            border-left: 4px solid var(--neon-blue);
+        }
+        
+        .corner-top-right {
+            top: 0;
+            right: 0;
+            border-top: 4px solid var(--neon-pink);
+            border-right: 4px solid var(--neon-pink);
+        }
+        
+        .corner-bottom-left {
+            bottom: 0;
+            left: 0;
+            border-bottom: 4px solid var(--neon-green);
+            border-left: 4px solid var(--neon-green);
+        }
+        
+        .corner-bottom-right {
+            bottom: 0;
+            right: 0;
+            border-bottom: 4px solid var(--neon-yellow);
+            border-right: 4px solid var(--neon-yellow);
+        }
+        
+        /* Floating elements */
+        .floating-icon {
+            position: absolute;
+            z-index: 2;
+            opacity: 0.7;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(10deg);
+            }
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+        }
+        
+        .icon-1 {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .icon-2 {
+            top: 60%;
+            right: 15%;
+            animation-delay: 1s;
+        }
+        
+        .icon-3 {
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 2s;
+        }
+        
+        .icon-4 {
+            top: 30%;
+            right: 25%;
+            animation-delay: 3s;
+        }
+        
+        /* Progress bar */
+        .progress-bar {
+            height: 5px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1001;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+            transition: width 0.3s ease;
+        }
+        
+        /* Retro scanlines effect */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0.03) 50%,
+                rgba(0, 0, 0, 0.1) 50%
+            );
+            background-size: 100% 4px;
+            z-index: 99;
+            pointer-events: none;
+            opacity: 0.2;
+        }
+        
+        /* Pixelated cursor */
+        body {
+            cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><rect x='0' y='0' width='4' height='4' fill='%2300f3ff'/><rect x='4' y='4' width='4' height='4' fill='%2300f3ff'/><rect x='8' y='8' width='4' height='4' fill='%2300f3ff'/><rect x='12' y='12' width='4' height='4' fill='%2300f3ff'/></svg>") 8 8, auto;
+        }
+        
+        a, button, .action-btn {
+            cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><rect x='0' y='0' width='16' height='16' fill='%23ff00ff'/><rect x='2' y='2' width='12' height='12' fill='%23000'/><rect x='4' y='4' width='8' height='8' fill='%23ff00ff'/></svg>") 8 8, pointer;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .profile-sections {
+                gap: 20px;
+            }
+            
+            .profile-section {
+                padding: 20px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .floating-icon {
+                display: none;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress bar -->
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+    
+    <!-- Retro scanlines effect -->
+    <div class="scanlines"></div>
+    
+    <!-- Game UI corners -->
+    <div class="game-ui-corner corner-top-left"></div>
+    <div class="game-ui-corner corner-top-right"></div>
+    <div class="game-ui-corner corner-bottom-left"></div>
+    <div class="game-ui-corner corner-bottom-right"></div>
+    
+    <!-- Floating icons -->
+    <div class="floating-icon icon-1">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#00f3ff" stroke-width="2"/>
+            <path d="M2 17L12 22L22 17" stroke="#00f3ff" stroke-width="2"/>
+            <path d="M2 12L12 17L22 12" stroke="#00f3ff" stroke-width="2"/>
+        </svg>
+    </div>
+    
+    <div class="floating-icon icon-2">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 11C13.1046 11 14 10.1046 14 9C14 7.89543 13.1046 7 12 7C10.8954 7 10 7.89543 10 9C10 10.1046 10.8954 11 12 11Z" stroke="#ff00ff" stroke-width="2"/>
+            <path d="M17 5H7C5.89543 5 5 5.89543 5 7V17C5 18.1046 5.89543 19 7 19H17C18.1046 19 19 18.1046 19 17V7C19 5.89543 18.1046 5 17 5Z" stroke="#ff00ff" stroke-width="2"/>
+            <path d="M14 15H10V19H14V15Z" stroke="#ff00ff" stroke-width="2"/>
+        </svg>
+    </div>
+    
+    <div class="floating-icon icon-3">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#39ff14" stroke-width="2"/>
+            <path d="M12 6V12L16 14" stroke="#39ff14" stroke-width="2"/>
+        </svg>
+    </div>
+    
+    <div class="floating-icon icon-4">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="#ffff00" stroke-width="2"/>
+        </svg>
+    </div>
+
+    <!-- Animated background particles -->
+    <div class="bg-particles" id="particles"></div>
+    
+    <!-- Include Gamified Navbar Component -->
+    {% include 'gamified-navbar.html' %}
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Student Profile</h1>
+            <p class="page-subtitle">Manage your account, view feedback, and access your data</p>
+        </div>
+
+        <!-- Profile Sections -->
+        <div class="profile-sections">
+            <!-- Personal Information Section -->
+            <div class="profile-section" id="personalInfoSection">
+                <div class="section-header">
+                    <h2>Personal Information</h2>
+                    <button class="edit-btn" id="editPersonalBtn">Edit</button>
+                </div>
+                <div class="section-content">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>First Name</label>
+                            <span id="firstNameDisplay"></span>
+                        </div>
+                        <div class="info-item">
+                            <label>Last Name</label>
+                            <span id="lastNameDisplay"></span>
+                        </div>
+                        <div class="info-item">
+                            <label>Email</label>
+                            <span id="emailDisplay"></span>
+                        </div>
+                        <div class="info-item">
+                            <label>Member Since</label>
+                            <span id="memberSinceDisplay"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Edit Form (Hidden by default) -->
+                <div class="edit-form" id="personalEditForm" style="display: none;">
+                    <form id="updatePersonalForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="editFirstName">First Name</label>
+                                <input type="text" id="editFirstName" name="first_name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editLastName">Last Name</label>
+                                <input type="text" id="editLastName" name="last_name" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="editEmail">Email</label>
+                            <input type="email" id="editEmail" name="email" required>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancelPersonalBtn">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Password Change Section -->
+            <div class="profile-section" id="passwordSection">
+                <div class="section-header">
+                    <h2>Change Password</h2>
+                </div>
+                <div class="section-content">
+                    <form id="changePasswordForm">
+                        <div class="form-group">
+                            <label for="currentPassword">Current Password</label>
+                            <input type="password" id="currentPassword" name="current_password" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="newPassword">New Password</label>
+                                <input type="password" id="newPassword" name="new_password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmPassword">Confirm New Password</label>
+                                <input type="password" id="confirmPassword" name="confirm_password" required>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Change Password</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Feedback Section -->
+            <div class="profile-section" id="feedbackSection">
+                <div class="section-header">
+                    <h2>My Feedback</h2>
+                    <button class="add-btn" id="addFeedbackBtn">Add Feedback</button>
+                </div>
+                <div class="section-content">
+                    <div class="feedback-list" id="feedbackList">
+                        <div class="loading">
+                            <div class="loading-spinner"></div>
+                            <p>Loading feedback...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Add Feedback Form (Hidden by default) -->
+                <div class="add-form" id="addFeedbackForm" style="display: none;">
+                    <form id="newFeedbackForm">
+                        <div class="form-group">
+                            <label for="feedbackText">Your Feedback</label>
+                            <textarea id="feedbackText" name="feedback" rows="4" required placeholder="Share your thoughts about Zpredict..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="feedbackRating">Rating</label>
+                            <select id="feedbackRating" name="rating" required>
+                                <option value="">Select a rating</option>
+                                <option value="5">Excellent</option>
+                                <option value="4">Good</option>
+                                <option value="3">Average</option>
+                                <option value="2">Poor</option>
+                                <option value="1">Very Poor</option>
+                            </select>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancelFeedbackBtn">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Quick Actions Section -->
+            <div class="profile-section" id="quickActionsSection">
+                <div class="section-header">
+                    <h2>Quick Actions</h2>
+                </div>
+                <div class="section-content">
+                    <div class="actions-grid">
+                        <button class="action-btn" id="viewChatHistoryBtn">
+                            <div class="action-icon">💬</div>
+                            <div class="action-text">
+                                <h3>Chat History</h3>
+                                <p>View your past conversations with AI</p>
+                            </div>
+                        </button>
+                        <button class="action-btn" id="viewPredictionsBtn">
+                            <div class="action-icon">🎯</div>
+                            <div class="action-text">
+                                <h3>My Predictions</h3>
+                                <p>View your saved predictions</p>
+                            </div>
+                        </button>
+                        <button class="action-btn" id="viewCareerBtn">
+                            <div class="action-icon">🚀</div>
+                            <div class="action-text">
+                                <h3>Career Predictions</h3>
+                                <p>View your career recommendations</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Management Section -->
+            <div class="profile-section danger-zone" id="accountSection">
+                <div class="section-header">
+                    <h2>Account Management</h2>
+                </div>
+                <div class="section-content">
+                    <div class="danger-actions">
+                        <div class="danger-item">
+                            <div class="danger-info">
+                                <h3>Deactivate Account</h3>
+                                <p>Your account will be temporarily deactivated. You can reactivate it by logging in again.</p>
+                            </div>
+                            <button class="btn btn-warning" id="deactivateAccountBtn">Deactivate Account</button>
+                        </div>
+                        <div class="danger-item">
+                            <div class="danger-info">
+                                <h3>Delete Account</h3>
+                                <p>This action cannot be undone. All your data will be permanently deleted.</p>
+                            </div>
+                            <button class="btn btn-danger" id="deleteAccountBtn">Delete Account</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Confirm Action</h3>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="modalMessage">Are you sure you want to proceed?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="modalCancel">Cancel</button>
+                <button class="btn btn-danger" id="modalConfirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span id="toastMessage"></span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/authentication.js' %}"></script>
+    <script src="{% static 'js/profile.js' %}"></script>
+    
+    <script>
+        // Gamified Student Profile Manager
+        class GamifiedProfileManager {
+            constructor() {
+                this.init();
+            }
+            
+            init() {
+                this.setupParticles();
+                this.setupScrollProgress();
+                this.setupAnimations();
+            }
+            
+            // Setup particle background effect
+            setupParticles() {
+                const particles = document.getElementById('particles');
+                if (particles) {
+                    for (let i = 0; i < 50; i++) {
+                        const particle = document.createElement('div');
+                        particle.style.position = 'absolute';
+                        particle.style.width = Math.random() * 5 + 2 + 'px';
+                        particle.style.height = particle.style.width;
+                        particle.style.background = i % 3 === 0 ? '#6C63FF' : i % 3 === 1 ? '#36D6C3' : '#FF6B8B';
+                        particle.style.borderRadius = '50%';
+                        particle.style.opacity = Math.random() * 0.5 + 0.1;
+                        particle.style.top = Math.random() * 100 + 'vh';
+                        particle.style.left = Math.random() * 100 + 'vw';
+                        
+                        particles.appendChild(particle);
+                        this.animateParticle(particle);
+                    }
+                }
+            }
+            
+            animateParticle(particle) {
+                const duration = Math.random() * 10 + 10;
+                
+                particle.animate([
+                    { transform: 'translateY(0px)', opacity: particle.style.opacity },
+                    { transform: `translateY(${Math.random() * 100 - 50}px) translateX(${Math.random() * 100 - 50}px)`, opacity: Math.random() * 0.5 }
+                ], {
+                    duration: duration * 1000,
+                    iterations: Infinity,
+                    direction: 'alternate',
+                    easing: 'ease-in-out'
+                });
+            }
+            
+            // Setup scroll progress bar
+            setupScrollProgress() {
+                window.addEventListener('scroll', () => {
+                    const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                    const scrolled = (winScroll / height) * 100;
+                    const progressFill = document.getElementById('progressFill');
+                    if (progressFill) {
+                        progressFill.style.width = scrolled + '%';
+                    }
+                });
+            }
+            
+            // Setup animations
+            setupAnimations() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('animate-in');
+                        }
+                    });
+                }, { threshold: 0.1 });
+                
+                document.querySelectorAll('.profile-section, .page-header').forEach(el => {
+                    observer.observe(el);
+                });
+            }
+        }
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new GamifiedProfileManager();
+        });
+    </script>
+</body>
+</html>

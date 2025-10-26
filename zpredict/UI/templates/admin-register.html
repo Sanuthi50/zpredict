@@ -1,241 +1,302 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Register Admin - University Guidance System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    /* Admin Dashboard Variables */
+    :root {
+        --primary: #6C63FF;
+        --primary-dark: #564FD8;
+        --secondary: #FF6B8B;
+        --accent: #36D6C3;
+        --dark: #1A1A2E;
+        --light: #FFFFFF;
+        --gray: #F5F5F7;
+        --gray-dark: #6C757D;
+        --success: #00C9A7;
+        --warning: #FFC75F;
+        --danger: #FF8066;
+        --gradient-primary: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        --gradient-accent: linear-gradient(135deg, var(--secondary), var(--accent));
+        --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 10px 15px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 20px 25px rgba(0, 0, 0, 0.15);
+        --radius: 12px;
+        --radius-lg: 20px;
+    }
+
+    /* Global Styles */
+    * {
+        box-sizing: border-box;
+    }
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f4f6f9;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+        font-family: 'Inter', sans-serif;
+        color: var(--dark);
+        background: var(--gradient-primary);
+        line-height: 1.6;
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
     }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+    }
+
+    /* Container */
     .container {
-      background: white;
-      padding: 40px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 500px;
+        width: 100%;
+        max-width: 500px;
+        background: var(--light);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        animation: fadeIn 0.5s ease-in;
     }
-    h2 {
-      text-align: center;
-      color: #2c3e50;
-      margin-bottom: 20px;
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
+
+    /* Header */
+    .header {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 30px;
+        text-align: center;
+    }
+
+    .header h2 {
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    .header p {
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    /* Main Content */
+    .main-content {
+        padding: 30px;
+    }
+
+    /* Form Section */
+    .form-section {
+        background: var(--light);
+        border-radius: var(--radius);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        color: var(--dark);
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .section-title i {
+        margin-right: 10px;
+        color: var(--primary);
+    }
+
     .form-group {
-      margin-bottom: 18px;
+        margin-bottom: 20px;
     }
+
     label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 500;
-      color: #34495e;
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--dark);
     }
-    input[type="text"],
-    input[type="email"],
-    input[type="password"] {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #bdc3c7;
-      border-radius: 6px;
-      font-size: 16px;
-      box-sizing: border-box;
+
+    input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: var(--radius);
+        font-size: 16px;
+        transition: all 0.3s ease;
+        font-family: 'Inter', sans-serif;
     }
-    button {
-      width: 100%;
-      padding: 12px;
-      background-color: #3498db;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 10px;
+
+    input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
     }
-    button:hover {
-      background-color: #2980b9;
+
+    .btn {
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: var(--radius);
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
     }
-    button:disabled {
-      background-color: #95a5a6;
-      cursor: not-allowed;
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
     }
-    .alert {
-      padding: 12px;
-      margin-bottom: 20px;
-      border-radius: 6px;
-      color: white;
+
+    .btn:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
     }
-    .error {
-      background-color: #e74c3c;
+
+    .message {
+        padding: 15px;
+        border-radius: var(--radius);
+        margin: 15px 0;
+        font-weight: 600;
+        animation: fadeIn 0.5s ease-out;
+        border-left: 4px solid;
+        text-align: center;
     }
+
     .success {
-      background-color: #2ecc71;
+        background: #d4edda;
+        color: #155724;
+        border-color: var(--success);
     }
+
+    .error {
+        background: #f8d7da;
+        color: #721c24;
+        border-color: var(--danger);
+    }
+
     .login-link {
-      text-align: center;
-      margin-top: 15px;
-      font-size: 14px;
-      color: #7f8c8d;
+        text-align: center;
+        margin-top: 25px;
     }
+
+    .login-link p {
+        color: #666;
+        margin: 0;
+    }
+
     .login-link a {
-      color: #3498db;
-      text-decoration: none;
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 600;
     }
+
     .login-link a:hover {
-      text-decoration: underline;
+        text-decoration: underline;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .container {
+            max-width: 90%;
+        }
+        
+        .header h2 {
+            font-size: 1.8rem;
+        }
+        
+        .main-content {
+            padding: 20px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .container {
+            max-width: 95%;
+        }
+        
+        .header {
+            padding: 20px;
+        }
+        
+        .header h2 {
+            font-size: 1.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+        }
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h2>🔐 Admin Registration</h2>
+    <div class="header">
+      <h2>🔐 Admin Registration</h2>
+      <p>Create your administrator account</p>
+    </div>
 
-    <!-- Message Display (will be replaced by JS) -->
-    <div id="message"></div>
+    <div class="main-content">
+      <!-- Message Display (will be replaced by JS) -->
+      <div id="message"></div>
 
-    <form id="registerForm">
-      <!-- No csrf_token needed for API calls -->
+      <form id="registerForm">
+        <!-- No csrf_token needed for API calls -->
 
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" placeholder="admin@university.lk" required />
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="admin@university.lk" required />
+        </div>
+
+        <div class="form-group">
+          <label for="first_name">First Name</label>
+          <input type="text" id="first_name" name="first_name" placeholder="John" required />
+        </div>
+
+        <div class="form-group">
+          <label for="last_name">Last Name</label>
+          <input type="text" id="last_name" name="last_name" placeholder="Doe" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" required />
+        </div>
+
+        <div class="form-group">
+          <label for="confirm_password">Confirm Password</label>
+          <input type="password" id="confirm_password" name="confirm_password" placeholder="••••••••" required />
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn"><i class="fas fa-user-plus"></i> Register Admin</button>
+      </form>
+
+      <div class="login-link">
+        <p>Already have an account? <a href='http://127.0.0.1:8000/admin-dashboard/'>Login here</a></p>
       </div>
-
-      <div class="form-group">
-        <label for="first_name">First Name</label>
-        <input type="text" id="first_name" name="first_name" placeholder="John" required />
-      </div>
-
-      <div class="form-group">
-        <label for="last_name">Last Name</label>
-        <input type="text" id="last_name" name="last_name" placeholder="Doe" required />
-      </div>
-
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" placeholder="••••••••" required />
-      </div>
-
-      <div class="form-group">
-        <label for="confirm_password">Confirm Password</label>
-        <input type="password" id="confirm_password" name="confirm_password" placeholder="••••••••" required />
-      </div>
-
-      <button type="submit" id="submitBtn">Register Admin</button>
-    </form>
-
-    <div class="login-link">
-      Already have an account? <a href='http://127.0.0.1:8000/admin-dashboard/'>Login here</a>
     </div>
   </div>
-
-  <script>
-    // Base URL - Update if needed
-    const API_BASE_URL = 'http://127.0.0.1:8000'; // Change to your backend domain if different
-
-    document.getElementById('registerForm').addEventListener('submit', async function(e) {
-      e.preventDefault(); // Prevent default form submission
-
-      const email = document.getElementById('email').value.trim();
-      const first_name = document.getElementById('first_name').value.trim();
-      const last_name = document.getElementById('last_name').value.trim();
-      const password = document.getElementById('password').value;
-      const confirm_password = document.getElementById('confirm_password').value;
-
-      const messageDiv = document.getElementById('message');
-      const submitBtn = document.getElementById('submitBtn');
-
-      // Clear previous messages
-      messageDiv.innerHTML = '';
-
-      // Client-side validation
-      if (password !== confirm_password) {
-        showMessage('Passwords do not match.', 'error');
-        return;
-      }
-
-      if (password.length < 6) {
-        showMessage('Password must be at least 6 characters.', 'error');
-        return;
-      }
-
-      // Disable button during request
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Registering...';
-
-      try {
-        const response = await fetch('http://127.0.0.1:8000/api/admin/register/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: email,
-            first_name: first_name,
-            last_name: last_name,
-            password: password,
-            confirm_password: confirm_password  
-          })
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          showMessage('Registration successful! Redirecting to login...', 'success');
-          // Optionally clear form
-          setTimeout(() => { window.location.href = "http://127.0.0.1:8000/admin-dashboard/"; }, 1500);
-        } else {
-          // Try to get JSON error
-          let errorMessage = 'Registration failed.';
-          try {
-            const errorData = await response.json();
-            const errorKeys = Object.keys(errorData);
-            if (errorKeys.includes('email')) {
-              errorMessage = 'Email: ' + errorData.email.join(', ');
-            } else if (errorKeys.includes('non_field_errors')) {
-              errorMessage = errorData.non_field_errors.join(', ');
-            } else {
-              errorMessage = Object.values(errorData)[0];
-            }
-          } catch (e) {
-            // Fallback: if response is not JSON
-            const errorText = await response.text();
-            console.warn("Server error (non-JSON):", errorText);
-            errorMessage = 'Server error. Check console.';
-          }
-          showMessage(errorMessage, 'error');
-        }
-      } catch (error) {
-        console.error('Network or server error:', error);
-        showMessage('Unable to connect to server. Is it running?', 'error');
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Register Admin';
-      }
-    });
-
-    // Utility to show messages
-    function showMessage(text, type) {
-      const messageDiv = document.getElementById('message');
-      const alert = document.createElement('div');
-      alert.className = `alert ${type}`;
-      alert.textContent = text;
-      messageDiv.innerHTML = '';
-      messageDiv.appendChild(alert);
-
-      setTimeout(() => {
-        if (alert.parentElement) {
-          alert.remove();
-        }
-      }, 5000);
-    }
-  </script>
+  <script src="{% static 'js/admin-reg.js' %}"></script>
 
 </body>
 </html>

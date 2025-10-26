@@ -1,0 +1,759 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Terminal - Zpredict</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Game-inspired styles matching home page */
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ff;
+            --neon-green: #39ff14;
+            --neon-yellow: #ffff00;
+            --dark-bg: #0a1a3b;
+            --darker-bg: #050b1f;
+            --card-bg: rgba(16, 18, 37, 0.9);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--darker-bg) 0%, var(--dark-bg) 70%);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            background-attachment: fixed;
+            min-height: 100vh;
+            cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><rect x='0' y='0' width='4' height='4' fill='%2300f3ff'/><rect x='4' y='4' width='4' height='4' fill='%2300f3ff'/><rect x='8' y='8' width='4' height='4' fill='%2300f3ff'/><rect x='12' y='12' width='4' height='4' fill='%2300f3ff'/></svg>") 8 8, auto;
+        }
+        
+        /* Progress bar */
+        .progress-bar {
+            height: 5px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1001;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+            transition: width 0.3s ease;
+            animation: pulse-bar 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-bar {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+        
+        /* Retro scanlines effect */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0.03) 50%,
+                rgba(0, 0, 0, 0.1) 50%
+            );
+            background-size: 100% 4px;
+            z-index: 99;
+            pointer-events: none;
+            opacity: 0.2;
+        }
+        
+        /* Game UI corners */
+        .game-ui-corner {
+            position: fixed;
+            width: 150px;
+            height: 150px;
+            z-index: 5;
+            pointer-events: none;
+        }
+        
+        .corner-top-left {
+            top: 0;
+            left: 0;
+            border-top: 4px solid var(--neon-blue);
+            border-left: 4px solid var(--neon-blue);
+        }
+        
+        .corner-top-right {
+            top: 0;
+            right: 0;
+            border-top: 4px solid var(--neon-pink);
+            border-right: 4px solid var(--neon-pink);
+        }
+        
+        .corner-bottom-left {
+            bottom: 0;
+            left: 0;
+            border-bottom: 4px solid var(--neon-green);
+            border-left: 4px solid var(--neon-green);
+        }
+        
+        .corner-bottom-right {
+            bottom: 0;
+            right: 0;
+            border-bottom: 4px solid var(--neon-yellow);
+            border-right: 4px solid var(--neon-yellow);
+        }
+        
+        /* Navigation handled by gamified-navbar.html component */
+        
+        /* Main container */
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 80px);
+            padding: 40px 20px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .login-terminal {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            box-shadow: 0 20px 40px rgba(0, 243, 255, 0.2);
+        }
+        
+        .login-terminal::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink), var(--neon-green));
+            z-index: -1;
+            border-radius: inherit;
+            animation: border-flow 3s linear infinite;
+        }
+        
+        @keyframes border-flow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        
+        .terminal-header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .terminal-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M 8 0 L 0 0 0 8" fill="none" stroke="%2300f3ff" stroke-width="0.3" opacity="0.2"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+            z-index: -1;
+            border-radius: 10px;
+        }
+        
+        .title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(0, 243, 255, 0.8);
+            animation: glow 3s ease-in-out infinite alternate;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
+            }
+            to {
+                text-shadow: 0 0 15px var(--neon-pink), 0 0 30px var(--neon-pink);
+            }
+        }
+        
+        .subtitle {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            color: var(--neon-green);
+            text-shadow: 2px 2px 0 #000;
+            letter-spacing: 1px;
+        }
+        
+        /* Form styles */
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .input-container {
+            position: relative;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            border: 2px solid var(--neon-blue);
+            padding: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .input-container:hover,
+        .input-container:focus-within {
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            z-index: 2;
+        }
+        
+        .input-icon img {
+            width: 100%;
+            height: 100%;
+            filter: brightness(0) saturate(100%) invert(62%) sepia(96%) saturate(2592%) hue-rotate(175deg) brightness(103%) contrast(101%);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 15px 15px 15px 50px;
+            background: transparent;
+            border: none;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            border-radius: 8px;
+        }
+        
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+        
+        .form-input:focus::placeholder {
+            color: var(--neon-yellow);
+        }
+        
+        /* Submit button */
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink));
+            border: none;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            transition: all 0.3s;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+        
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--neon-green), var(--neon-yellow));
+            transition: all 0.6s;
+            z-index: -1;
+        }
+        
+        .submit-btn:hover::before {
+            left: 0;
+        }
+        
+        .submit-btn:hover {
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.7);
+            transform: translateY(-2px);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading-animation {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Login extras */
+        .login-extras {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .forgot-password {
+            color: var(--neon-yellow);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .forgot-password:hover {
+            color: var(--neon-green);
+            text-shadow: 0 0 5px var(--neon-green);
+        }
+        
+        .feature-icon img {
+            width: 20px;
+            height: 20px;
+            filter: brightness(0) saturate(100%) invert(85%) sepia(89%) saturate(2287%) hue-rotate(296deg) brightness(104%) contrast(101%);
+        }
+        
+        .signup-prompt {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #ccc;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .signup-link {
+            color: var(--neon-blue);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .signup-link:hover {
+            color: var(--neon-pink);
+            text-shadow: 0 0 5px var(--neon-pink);
+        }
+        
+        /* Status messages */
+        .status {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .status.success {
+            background: rgba(57, 255, 20, 0.2);
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+        }
+        
+        .status.error {
+            background: rgba(255, 0, 100, 0.2);
+            border: 1px solid #ff0064;
+            color: #ff0064;
+        }
+        
+        /* Floating particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float-particle 15s linear infinite;
+        }
+        
+        @keyframes float-particle {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Terminal typing effect */
+        .terminal-text {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            color: var(--neon-green);
+            margin-bottom: 20px;
+            text-align: left;
+            line-height: 1.5;
+        }
+        
+        .cursor {
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .login-terminal {
+                margin: 20px;
+                padding: 30px 25px;
+                max-width: none;
+            }
+            
+            .title {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 0.6rem;
+            }
+            
+            .game-ui-corner {
+                width: 80px;
+                height: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress bar -->
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+    
+    <!-- Retro scanlines effect -->
+    <div class="scanlines"></div>
+    
+    <!-- Game UI corners -->
+    <div class="game-ui-corner corner-top-left"></div>
+    <div class="game-ui-corner corner-top-right"></div>
+    <div class="game-ui-corner corner-bottom-left"></div>
+    <div class="game-ui-corner corner-bottom-right"></div>
+    
+    <!-- Particles container -->
+    <div class="particles" id="particles"></div>
+        
+  <!-- Include Gamified Navbar Component -->
+  {% include 'gamified-navbar.html' %}
+
+     
+    <div class="main-container">      
+        <div class="login-terminal">
+            <!-- Terminal header -->
+            <div class="terminal-header">
+                <div class="terminal-text">
+                    > INITIALIZING SECURE CONNECTION...<br>
+                    > BIOMETRIC SCAN: <span style="color: var(--neon-yellow);">READY</span><br>
+                    > STATUS: <span style="color: var(--neon-green);">ONLINE</span><span class="cursor">|</span>
+                </div>
+                <h1 class="title">Access Terminal</h1>
+                <p class="subtitle">Identity Verification Required</p>
+            </div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <div class="input-container">
+                        <div class="input-icon">
+                            <img src="{% static 'images/communication.png' %}" alt="Email Icon">
+                        </div>
+                        <input type="email" id="email" name="email" class="form-input" placeholder="Email Address" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="input-container">
+                        <div class="input-icon">
+                            <img src="{% static 'images/password.png' %}" alt="Password Icon">
+                        </div>
+                        <input type="password" id="password" name="password" class="form-input" placeholder="Access Code" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    Initialize Connection
+                </button>
+            </form>
+                   
+            <p class="signup-prompt">Need Access Clearance? <a href="http://127.0.0.1:8000/website/register/" class="signup-link">Request Registration</a></p>
+            
+            <div class="status" id="status"></div>
+        </div>
+    </div>
+
+    <script>
+        // Login Page Manager with gamified effects
+        class LoginPageManager {
+            constructor() {
+                this.init();
+            }
+        
+            init() {
+                this.setupParticles();
+                this.setupProgressBar();
+                this.setupLoginForm();
+                this.setupTerminalEffects();
+                this.setupInputEffects();
+            }
+        
+            // Create particle background effect
+            setupParticles() {
+                const particlesContainer = document.getElementById('particles');
+                const colors = ['#6C63FF', '#FF6B8B', '#36D6C3', '#FFC75F'];
+                
+                for (let i = 0; i < 25; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    
+                    const size = Math.random() * 8 + 3;
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.background = color;
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.animationDuration = `${Math.random() * 10 + 8}s`;
+                    particle.style.animationDelay = `${Math.random() * 5}s`;
+                    
+                    particlesContainer.appendChild(particle);
+                }
+            }
+        
+            // Setup progress bar animation
+            setupProgressBar() {
+                // Simulate loading progress
+                let progress = 0;
+                const progressFill = document.getElementById('progressFill');
+                
+                const interval = setInterval(() => {
+                    progress += Math.random() * 3;
+                    if (progress > 100) progress = 100;
+                    
+                    progressFill.style.width = `${progress}%`;
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                    }
+                }, 100);
+            }
+        
+            // Setup terminal typing effects
+            setupTerminalEffects() {
+                const terminalText = document.querySelector('.terminal-text');
+                if (terminalText) {
+                    // Add glitch effect occasionally
+                    setInterval(() => {
+                        if (Math.random() > 0.95) {
+                            terminalText.style.textShadow = '2px 0 var(--neon-pink), -2px 0 var(--neon-blue)';
+                            setTimeout(() => {
+                                terminalText.style.textShadow = '2px 2px 0 #000';
+                            }, 100);
+                        }
+                    }, 1000);
+                }
+            }
+        
+            // Setup input field effects
+            setupInputEffects() {
+                const inputs = document.querySelectorAll('.form-input');
+                inputs.forEach(input => {
+                    input.addEventListener('focus', () => {
+                        input.closest('.input-container').style.transform = 'scale(1.02)';
+                    });
+                    
+                    input.addEventListener('blur', () => {
+                        input.closest('.input-container').style.transform = 'scale(1)';
+                    });
+                    
+                    // Typing sound effect simulation (visual feedback)
+                    input.addEventListener('input', () => {
+                        input.style.textShadow = '0 0 5px var(--neon-blue)';
+                        setTimeout(() => {
+                            input.style.textShadow = 'none';
+                        }, 100);
+                    });
+                });
+            }
+        
+            // Setup login form functionality
+            setupLoginForm() {
+                const form = document.getElementById('loginForm');
+                const statusDiv = document.getElementById('status');
+                const submitBtn = document.getElementById('submitBtn');
+                
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    
+                    // Enhanced button loading state
+                    submitBtn.innerHTML = 'Establishing Link... <span class="loading-animation"></span>';
+                    submitBtn.disabled = true;
+                    
+                    // Add hacking effect
+                    statusDiv.innerHTML = '<span style="color: var(--neon-yellow);">Authenticating credentials...</span>';
+                    statusDiv.className = 'status';
+                    
+                    try {
+                        const response = await fetch('http://127.0.0.1:8000/api/login/', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email, password })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (response.ok) {
+                            // Token storage
+                            localStorage.setItem('access_token', data.access);
+                            localStorage.setItem('refresh_token', data.refresh);
+                            
+                            statusDiv.className = 'status success';
+                            statusDiv.innerHTML = "ACCESS GRANTED! Redirecting to mainframe...";
+                            
+                            // Add success particle burst
+                            this.createParticleBurst();
+                            
+                            setTimeout(() => { 
+                                window.location.href = "http://127.0.0.1:8000/gamified/"; 
+                            }, 1500);
+                        } else {
+                            statusDiv.className = 'status error';
+                            statusDiv.innerHTML = "ACCESS DENIED: " + (data.detail || "Authentication failed");
+                            
+                            // Add screen shake effect
+                            document.body.style.animation = 'shake 0.5s';
+                            setTimeout(() => {
+                                document.body.style.animation = '';
+                            }, 500);
+                        }
+                    } catch (err) {
+                        statusDiv.className = 'status error';
+                        statusDiv.innerHTML = "CONNECTION ERROR: " + err.message;
+                    } finally {
+                        // Reset button
+                        submitBtn.innerHTML = 'Initialize Connection';
+                        submitBtn.disabled = false;
+                    }
+                });
+            }
+        
+            // Create particle burst effect on success
+            createParticleBurst() {
+                const colors = ['var(--neon-blue)', 'var(--neon-pink)', 'var(--neon-green)', 'var(--neon-yellow)'];
+                const container = document.querySelector('.login-terminal');
+                
+                for (let i = 0; i < 15; i++) {
+                    const particle = document.createElement('div');
+                    particle.style.position = 'absolute';
+                    particle.style.width = '8px';
+                    particle.style.height = '8px';
+                    particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    particle.style.borderRadius = '50%';
+                    particle.style.left = '50%';
+                    particle.style.top = '50%';
+                    particle.style.pointerEvents = 'none';
+                    particle.style.zIndex = '1000';
+                    
+                    container.appendChild(particle);
+                    
+                    const angle = (Math.PI * 2 * i) / 15;
+                    const velocity = 100 + Math.random() * 50;
+                    
+                    particle.animate([
+                        { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+                        { 
+                            transform: `translate(${Math.cos(angle) * velocity - 50}%, ${Math.sin(angle) * velocity - 50}%) scale(0)`,
+                            opacity: 0
+                        }
+                    ], {
+                        duration: 1000,
+                        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                    }).onfinish = () => particle.remove();
+                }
+            }
+        }
+        
+        // Add shake animation for error states
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+                20%, 40%, 60%, 80% { transform: translateX(2px); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new LoginPageManager();
+        });
+    </script>
+</body>
+</html>

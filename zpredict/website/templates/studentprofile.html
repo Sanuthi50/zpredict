@@ -1,0 +1,236 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Profile - Zpredict</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{% static 'css/studentprofile.css' %}" rel="stylesheet">
+</head>
+<body>
+    <!-- Animated background particles -->
+    <div class="bg-particles" id="particles"></div>
+    
+    <!-- Include Navbar Component -->
+    {% include 'navbar.html' %}
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Student Profile</h1>
+            <p class="page-subtitle">Manage your account, view feedback, and access your data</p>
+        </div>
+
+        <!-- Profile Sections -->
+        <div class="profile-sections">
+            <!-- Personal Information Section -->
+            <div class="profile-section" id="personalInfoSection">
+                <div class="section-header">
+                    <h2>Personal Information</h2>
+                    <button class="edit-btn" id="editPersonalBtn">Edit</button>
+                </div>
+                <div class="section-content">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>First Name</label>
+                            <span id="firstNameDisplay"></span>
+                        </div>
+                        <div class="info-item">
+                            <label>Last Name</label>
+                            <span id="lastNameDisplay"></span>
+                        </div>
+                        <div class="info-item">
+                            <label>Email</label>
+                            <span id="emailDisplay"></span>
+                        </div>
+                        <div class="info-item">
+                            <label>Member Since</label>
+                            <span id="memberSinceDisplay"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Edit Form (Hidden by default) -->
+                <div class="edit-form" id="personalEditForm" style="display: none;">
+                    <form id="updatePersonalForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="editFirstName">First Name</label>
+                                <input type="text" id="editFirstName" name="first_name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editLastName">Last Name</label>
+                                <input type="text" id="editLastName" name="last_name" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="editEmail">Email</label>
+                            <input type="email" id="editEmail" name="email" required>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancelPersonalBtn">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Password Change Section -->
+            <div class="profile-section" id="passwordSection">
+                <div class="section-header">
+                    <h2>Change Password</h2>
+                </div>
+                <div class="section-content">
+                    <form id="changePasswordForm">
+                        <div class="form-group">
+                            <label for="currentPassword">Current Password</label>
+                            <input type="password" id="currentPassword" name="current_password" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="newPassword">New Password</label>
+                                <input type="password" id="newPassword" name="new_password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmPassword">Confirm New Password</label>
+                                <input type="password" id="confirmPassword" name="confirm_password" required>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Change Password</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Feedback Section -->
+            <div class="profile-section" id="feedbackSection">
+                <div class="section-header">
+                    <h2>My Feedback</h2>
+                    <button class="add-btn" id="addFeedbackBtn">Add Feedback</button>
+                </div>
+                <div class="section-content">
+                    <div class="feedback-list" id="feedbackList">
+                        <div class="loading">
+                            <div class="loading-spinner"></div>
+                            <p>Loading feedback...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Add Feedback Form (Hidden by default) -->
+                <div class="add-form" id="addFeedbackForm" style="display: none;">
+                    <form id="newFeedbackForm">
+                        <div class="form-group">
+                            <label for="feedbackText">Your Feedback</label>
+                            <textarea id="feedbackText" name="feedback" rows="4" required placeholder="Share your thoughts about Zpredict..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="feedbackRating">Rating</label>
+                            <select id="feedbackRating" name="rating" required>
+                                <option value="">Select a rating</option>
+                                <option value="5">Excellent</option>
+                                <option value="4">Good</option>
+                                <option value="3">Average</option>
+                                <option value="2">Poor</option>
+                                <option value="1">Very Poor</option>
+                            </select>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancelFeedbackBtn">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Quick Actions Section -->
+            <div class="profile-section" id="quickActionsSection">
+                <div class="section-header">
+                    <h2>Quick Actions</h2>
+                </div>
+                <div class="section-content">
+                    <div class="actions-grid">
+                        <button class="action-btn" id="viewChatHistoryBtn">
+                            <div class="action-icon">💬</div>
+                            <div class="action-text">
+                                <h3>Chat History</h3>
+                                <p>View your past conversations with AI</p>
+                            </div>
+                        </button>
+                        <button class="action-btn" id="viewPredictionsBtn">
+                            <div class="action-icon">🎯</div>
+                            <div class="action-text">
+                                <h3>My Predictions</h3>
+                                <p>View your saved predictions</p>
+                            </div>
+                        </button>
+                        <button class="action-btn" id="viewCareerBtn">
+                            <div class="action-icon">🚀</div>
+                            <div class="action-text">
+                                <h3>Career Predictions</h3>
+                                <p>View your career recommendations</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Management Section -->
+            <div class="profile-section danger-zone" id="accountSection">
+                <div class="section-header">
+                    <h2>Account Management</h2>
+                </div>
+                <div class="section-content">
+                    <div class="danger-actions">
+                        <div class="danger-item">
+                            <div class="danger-info">
+                                <h3>Deactivate Account</h3>
+                                <p>Your account will be temporarily deactivated. You can reactivate it by logging in again.</p>
+                            </div>
+                            <button class="btn btn-warning" id="deactivateAccountBtn">Deactivate Account</button>
+                        </div>
+                        <div class="danger-item">
+                            <div class="danger-info">
+                                <h3>Delete Account</h3>
+                                <p>This action cannot be undone. All your data will be permanently deleted.</p>
+                            </div>
+                            <button class="btn btn-danger" id="deleteAccountBtn">Delete Account</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Confirm Action</h3>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="modalMessage">Are you sure you want to proceed?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="modalCancel">Cancel</button>
+                <button class="btn btn-danger" id="modalConfirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span id="toastMessage"></span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/auth-utils.js' %}"></script>
+    <script src="{% static 'js/studentprofile.js' %}"></script>
+</body>
+</html>

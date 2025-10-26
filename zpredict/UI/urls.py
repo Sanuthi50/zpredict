@@ -1,15 +1,16 @@
 from django.urls import path
-from .views import HomeView, ChatView, LoginView, RegisterView, AdminView, AdminRegisterView
+from .views import AdminView, AdminRegisterView, AdminLoginView, FeedbackManagementView, AdminProfileView, HomeView
 from . import views
 
 
 urlpatterns = [
-    path('', HomeView.as_view(), name='home'),
-    path('login/', LoginView.as_view(), name='login'),
-    path('register/', RegisterView.as_view(), name='register'),
-    path('chat/', ChatView.as_view(), name='chat'),
+    path('', HomeView.as_view(), name='home'),  # Home page at root URL
     path('admin-dashboard/', AdminView.as_view(), name= 'admin-dashboard'),  # Include API URLs for admin functionalities
     path('admin-register/', AdminRegisterView.as_view(), name='admin-register'),
     path('admin-reprocess/', views.AdminReprocessView.as_view(), name='admin-reprocess'),
-    path('prediction/', views.PredictionView.as_view(), name='prediction'),
+    path('admin-analytics/', views.AdminAnalyticsView.as_view(), name='admin-analytics'),
+    path('admin-login/',views.AdminLoginView.as_view(),name='admin-login'),
+    path('feedback-management/', FeedbackManagementView.as_view(), name='feedback-management'),
+    path('admin-profile/', AdminProfileView.as_view(), name='admin-profile'),
+   
 ]

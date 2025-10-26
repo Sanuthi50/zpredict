@@ -12,6 +12,22 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+# load .env file
+load_dotenv()
+
+# now you can access keys
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+# Network and API Configuration
+GEMINI_TIMEOUT = int(os.getenv("GEMINI_TIMEOUT", 30))
+GEMINI_MAX_RETRIES = int(os.getenv("GEMINI_MAX_RETRIES", 3))
+
+# Network timeout settings for external API calls
+import socket
+socket.setdefaulttimeout(GEMINI_TIMEOUT)
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,7 +57,7 @@ os.makedirs(MEDIA_ROOT / 'ugc_pdfs', exist_ok=True)
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(xjzv(-9cjii&6*t38gxllfjaq)(+qtp$sxq7zp$4g#$wg=s03'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -84,6 +100,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api',
     'UI',
+    'website',
+    'gamified',  # Gamified version
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
@@ -125,6 +143,23 @@ CELERY_TIMEZONE = 'UTC'
 # Redis settings (if using Redis for Celery)
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+# Temporarily use dummy cache instead of Redis to avoid connection errors
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+    }
+}
+
+# Redis cache configuration (commented out until Redis is properly configured)
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": "redis://127.0.0.1:6379/1",
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#         }
+#     }
+# }
 
 # Logging for file uploads
 LOGGING = {
@@ -154,10 +189,15 @@ ROOT_URLCONF = 'zpredict.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [
+            os.path.join(BASE_DIR, 'website', 'templates'),  # website templates first
+            os.path.join(BASE_DIR, 'UI', 'templates'),       # UI templates second
+            os.path.join(BASE_DIR, 'gamified', 'templates'), # gamified templates third
+        ],
+        'APP_DIRS': False,  # Disable app_dirs to have full control over template resolution
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -176,13 +216,12 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'zpredict',
-        'USER': 'postgres',             
-        'PASSWORD': 'Admin',    
-        'HOST': 'localhost',            
-        'PORT': '5432',                  
+        'USER': 'postgres',
+        'PASSWORD': 'Admin',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
-
 
 
 # Password validation
@@ -228,22 +267,4 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-AUTH_USER_MODEL = 'api.User'  # Use the custom User model defined in api/models.py  
-
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),  
-        ],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]
+AUTH_USER_MODEL = 'api.User'  # Use the custom User model defined in api/models.py

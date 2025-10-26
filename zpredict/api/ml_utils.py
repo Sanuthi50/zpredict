@@ -2,9 +2,10 @@ import os
 import joblib
 import pandas as pd
 import numpy as np
+import threading
+import logging
 from django.conf import settings
 from django.core.cache import cache
-import logging
 from typing import Dict, List, Any, Optional, Tuple
 
 logger = logging.getLogger(__name__)
@@ -15,7 +16,6 @@ class MLPredictor:
         self.classifier = None
         self.classifier_encoder = None
         self.feature_encoder = None
-        self.scaler = None
         self.valid_courses_map = None
         self.model_path = os.path.join(settings.BASE_DIR, 'api', 'ml_model')
         self.models_loaded = False
@@ -31,15 +31,25 @@ class MLPredictor:
                 self.classifier = cached_models.get('classifier')
                 self.classifier_encoder = cached_models.get('classifier_encoder')
                 self.feature_encoder = cached_models.get('feature_encoder')
-                self.scaler = cached_models.get('scaler')
                 self.valid_courses_map = cached_models.get('valid_courses_map')
-                self.models_loaded = True
-                logger.info("Models loaded from cache")
-                return
+                
+                # Verify all required models are loaded
+                if all([self.regressor, self.classifier, self.classifier_encoder, 
+                       self.feature_encoder, self.valid_courses_map]):
+                    self.models_loaded = True
+                    logger.info("All models loaded successfully from cache")
+                    return
+                else:
+                    logger.warning("Incomplete model cache, loading from disk...")
+                    # Clear the cache if it's incomplete
+                    cache.delete('ml_models')
             
             # Create model directory if it doesn't exist
             if not os.path.exists(self.model_path):
                 logger.error(f"Model directory does not exist: {self.model_path}")
+                logger.error(f"Current working directory: {os.getcwd()}")
+                logger.error(f"Looking for models in: {self.model_path}")
+                logger.error(f"Directory contents: {os.listdir(os.path.dirname(self.model_path))}")
                 return
             
             # Load all models
@@ -47,8 +57,19 @@ class MLPredictor:
             self._load_classifier()
             self._load_classifier_encoder()
             self._load_feature_encoder()
-            self._load_scaler()
             self._load_valid_courses_map()
+            
+            # Verify all models loaded successfully
+            if not all([self.regressor, self.classifier, self.classifier_encoder, 
+                       self.feature_encoder, self.valid_courses_map]):
+                logger.error("Failed to load one or more models:")
+                logger.error(f"Regressor: {'Loaded' if self.regressor else 'Failed'}")
+                logger.error(f"Classifier: {'Loaded' if self.classifier else 'Failed'}")
+                logger.error(f"Classifier Encoder: {'Loaded' if self.classifier_encoder else 'Failed'}")
+                logger.error(f"Feature Encoder: {'Loaded' if self.feature_encoder else 'Failed'}")
+                logger.error(f"Valid Courses Map: {'Loaded' if self.valid_courses_map else 'Failed'}")
+                self.models_loaded = False
+                return
             
             # Cache models for 1 hour if at least one model was loaded
             if self.regressor or self.classifier:
@@ -57,7 +78,6 @@ class MLPredictor:
                     'classifier': self.classifier,
                     'classifier_encoder': self.classifier_encoder,
                     'feature_encoder': self.feature_encoder,
-                    'scaler': self.scaler,
                     'valid_courses_map': self.valid_courses_map
                 }, 3600)
                 self.models_loaded = True
@@ -113,16 +133,6 @@ class MLPredictor:
                 logger.error(f"Error loading feature encoder: {str(e)}")
                 self.feature_encoder = None
     
-    def _load_scaler(self) -> None:
-        """Load scaler"""
-        scaler_path = os.path.join(self.model_path, 'scaler.pkl')
-        if os.path.exists(scaler_path):
-            try:
-                self.scaler = joblib.load(scaler_path)
-                logger.info("Scaler loaded successfully")
-            except Exception as e:
-                logger.error(f"Error loading scaler: {str(e)}")
-                self.scaler = None
     
     def _load_valid_courses_map(self) -> None:
         """Load valid courses map"""
@@ -135,6 +145,156 @@ class MLPredictor:
                 logger.error(f"Error loading valid courses map: {str(e)}")
                 self.valid_courses_map = None
     
+    def _ensure_models_loaded(self) -> bool:
+        """Ensure models are loaded, loading them if necessary.
+        
+        Returns:
+            bool: True if models are loaded successfully, False otherwise
+        """
+        if self.models_loaded:
+            return True
+            
+        logger.info("Models not loaded, attempting to load them now...")
+        self.load_models()
+        return self.models_loaded
+
+    def get_available_courses_for_stream(self, stream: str, limit: int = 100) -> List[Dict[str, str]]:
+        """Get available courses for a given stream
+        
+        Args:
+            stream: The stream to get courses for
+            limit: Maximum number of courses to return
+            
+        Returns:
+            List of dictionaries with course_name and university_name
+        """
+        if not self.valid_courses_map:
+            logger.error("Valid courses map not loaded")
+            return []
+            
+        stream = stream.lower()
+        if stream not in self.valid_courses_map:
+            logger.warning(f"No courses found for stream: {stream}")
+            return []
+            
+        courses = []
+        for course, univs in self.valid_courses_map[stream].items():
+            for univ in univs:
+                courses.append({
+                    'course_name': course,
+                    'university_name': univ
+                })
+                
+                if len(courses) >= limit:
+                    return courses
+                    
+        return courses
+        
+    def get_recommendation_status(self, probability: float) -> str:
+        """Get recommendation status based on probability
+        
+        Args:
+            probability: Probability of selection (0-1)
+            
+        Returns:
+            Recommendation status as string
+        """
+        if probability >= 0.8:
+            return "High Chance"
+        elif probability >= 0.5:
+            return "Moderate Chance"
+        elif probability >= 0.2:
+            return "Low Chance"
+        else:
+            return "Very Low Chance"
+
+    def predict_cutoff(self, year: int, university: str, course_name: str, district: str, 
+                      stream: str, aptitude_test: bool, all_island_merit: bool) -> float:
+        """
+        Predict the cutoff Z-score for a given course and university.
+        
+        Args:
+            year: The admission year
+            university: Name of the university
+            course_name: Name of the course
+            district: District of the applicant
+            stream: Stream (e.g., 'Biological Science', 'Physical Science')
+            aptitude_test: Whether the course requires an aptitude test
+            all_island_merit: Whether the application is through all-island merit
+            
+        Returns:
+            Predicted cutoff Z-score
+        """
+        if not self._validate_models_loaded():
+            raise ValueError("Models not properly loaded")
+            
+        try:
+            # Prepare input features
+            input_data = {
+                'year': year,
+                'university': university,
+                'course_name': course_name,
+                'district': district,
+                'stream': stream,
+                'aptitude_test': aptitude_test,
+                'all_island_merit': all_island_merit
+            }
+            
+            # Encode features for the regressor
+            features = self._encode_features_for_regressor(input_data)
+            
+            # Make prediction
+            prediction = self.regressor.predict(features)
+            return float(prediction[0])
+            
+        except Exception as e:
+            logger.error(f"Error in predict_cutoff: {str(e)}", exc_info=True)
+            raise
+    
+    def predict_selection_probability(self, z_score: float, stream: str, district: str,
+                                    course_name: str, university: str,
+                                    aptitude_test: bool, all_island_merit: bool) -> float:
+        """
+        Predict the probability of selection for a given course and Z-score.
+        
+        Args:
+            z_score: Applicant's Z-score
+            stream: Stream (e.g., 'Biological Science', 'Physical Science')
+            district: District of the applicant
+            course_name: Name of the course
+            university: Name of the university
+            aptitude_test: Whether the course requires an aptitude test
+            all_island_merit: Whether the application is through all-island merit
+            
+        Returns:
+            Probability of selection (0-1)
+        """
+        if not self._validate_models_loaded():
+            raise ValueError("Models not properly loaded")
+            
+        try:
+            # Prepare input features
+            input_data = {
+                'z_score': z_score,
+                'stream': stream,
+                'district': district,
+                'course_name': course_name,
+                'university': university,
+                'aptitude_test': aptitude_test,
+                'all_island_merit': all_island_merit
+            }
+            
+            # Encode features for the classifier
+            features = self._encode_features_for_classifier(input_data)
+            
+            # Make prediction (assuming binary classification)
+            proba = self.classifier.predict_proba(features)
+            return float(proba[0][1])  # Return probability of positive class
+            
+        except Exception as e:
+            logger.error(f"Error in predict_selection_probability: {str(e)}", exc_info=True)
+            raise
+    
     def _validate_models_loaded(self) -> bool:
         """Check if models are properly loaded"""
         if not self.models_loaded:
@@ -143,12 +303,19 @@ class MLPredictor:
         return True
     
     def _encode_features_for_regressor(self, data_dict: Dict[str, Any]) -> np.ndarray:
-        """Encode features for regressor using the feature encoder"""
+        """
+        Encode features for the regressor model.
+        
+        Args:
+            data_dict: Dictionary containing input features
+            
+        Returns:
+            Numpy array of encoded features
+        """
         if not self.feature_encoder:
             raise ValueError("Feature encoder not loaded")
         
-        # Prepare features in the order expected by the encoder (from ml_model.py)
-        # reg_cat_cols = ["University", "Course Name", "District", "Stream"]
+        # Prepare features in the order expected by the encoder
         features = [
             data_dict.get('university', ''),
             data_dict.get('course_name', ''),
@@ -156,16 +323,28 @@ class MLPredictor:
             data_dict.get('stream', '')
         ]
         
-        # Encode categorical features and convert to dense format
-        encoded_features = self.feature_encoder.transform([features]).toarray()
+        # Encode categorical features
+        try:
+            encoded_features = self.feature_encoder.transform([features])
+            # Convert sparse matrix to dense if needed and ensure 2D shape
+            if hasattr(encoded_features, 'toarray'):
+                encoded_features = encoded_features.toarray()
+            if encoded_features.ndim == 1:
+                encoded_features = encoded_features.reshape(1, -1)
+        except Exception as e:
+            logger.error(f"Error encoding features: {e}")
+            raise ValueError(f"Failed to encode features: {e}")
         
-        # Prepare numerical features in the order expected by the regressor
-        # reg_num_cols = ["Year", "Aptitude_Test", "All_Island_Merit"]
+        # Add numerical features (year, aptitude_test, all_island_merit)
         numerical_features = np.array([
-            data_dict.get('year', 2024),
-            data_dict.get('aptitude_test', False),
-            data_dict.get('all_island_merit', True)
+            data_dict.get('year', 2025),
+            int(data_dict.get('aptitude_test', False)),
+            int(data_dict.get('all_island_merit', True))
         ]).reshape(1, -1)
+        
+        # Combine numerical and encoded categorical features
+        combined_features = np.hstack([numerical_features, encoded_features])
+        return combined_features
         
         # Combine numerical and encoded categorical features exactly like in ml_model.py
         # np.hstack([numerical_features, encoded_categorical_features])
@@ -174,12 +353,19 @@ class MLPredictor:
         return combined_features
     
     def _encode_features_for_classifier(self, data_dict: Dict[str, Any]) -> np.ndarray:
-        """Encode features for classifier using the classifier encoder"""
+        """
+        Encode features for the classifier model.
+        
+        Args:
+            data_dict: Dictionary containing input features
+            
+        Returns:
+            Numpy array of encoded features
+        """
         if not self.classifier_encoder:
             raise ValueError("Classifier encoder not loaded")
         
-        # Prepare features in the order expected by the encoder (from ml_model.py)
-        # clf_cat_cols = ["Stream", "District", "Course Name", "University"]
+        # Prepare features in the order expected by the encoder
         features = [
             data_dict.get('stream', ''),
             data_dict.get('district', ''),
@@ -187,16 +373,28 @@ class MLPredictor:
             data_dict.get('university', '')
         ]
         
-        # Encode categorical features and convert to dense format
-        encoded_features = self.classifier_encoder.transform([features]).toarray()
+        # Encode categorical features
+        try:
+            encoded_features = self.classifier_encoder.transform([features])
+            # Convert sparse matrix to dense if needed and ensure 2D shape
+            if hasattr(encoded_features, 'toarray'):
+                encoded_features = encoded_features.toarray()
+            if encoded_features.ndim == 1:
+                encoded_features = encoded_features.reshape(1, -1)
+        except Exception as e:
+            logger.error(f"Error encoding classifier features: {e}")
+            raise ValueError(f"Failed to encode classifier features: {e}")
         
-        # Prepare numerical features in the order expected by the classifier
-        # clf_num_cols = ["Z_Score", "Aptitude_Test", "All_Island_Merit"]
+        # Add numerical features (z_score, aptitude_test, all_island_merit)
         numerical_features = np.array([
-            data_dict.get('z_score', 0.0),
-            data_dict.get('aptitude_test', False),
-            data_dict.get('all_island_merit', True)
+            float(data_dict.get('z_score', 0.0)),
+            int(data_dict.get('aptitude_test', False)),
+            int(data_dict.get('all_island_merit', True))
         ]).reshape(1, -1)
+        
+        # Combine numerical and encoded categorical features
+        combined_features = np.hstack([numerical_features, encoded_features])
+        return combined_features
         
         # Combine numerical and encoded categorical features exactly like in ml_model.py
         # np.hstack([numerical_features, encoded_categorical_features])
@@ -232,17 +430,11 @@ class MLPredictor:
             # Encode features
             encoded_features = self._encode_features_for_regressor(features_dict)
             
-            # Apply scaling if scaler is available
-            if self.scaler is not None:
-                # The scaler expects 87 features, so we need to handle this properly
-                # For now, we'll use the encoded features directly since the scaler
-                # seems to be for different features
-                scaled_features = encoded_features
-            else:
-                scaled_features = encoded_features
+            # Use encoded features directly (scaler not compatible with current model)
+            # The regressor was trained on these encoded features without scaling
             
             # Predict
-            prediction = self.regressor.predict(scaled_features)
+            prediction = self.regressor.predict(encoded_features)
             result = float(prediction[0])
             
             # Validate result
@@ -323,6 +515,10 @@ class MLPredictor:
             logger.warning("Valid courses map not loaded")
             return []
         
+        if not self.feature_encoder:
+            logger.warning("Feature encoder not loaded, cannot extract university data")
+            return []
+        
         # Map common stream names to the keys in valid_courses_map
         stream_mapping = {
             'physical': 'Physical Science',
@@ -359,26 +555,32 @@ class MLPredictor:
             logger.warning(f"No courses found for stream: {stream_key}")
             return []
         
-        # Generate course-university pairs
-        # For now, we'll use a default list of universities since we don't have a university encoder
-        default_universities = [
-            'University of Colombo',
-            'University of Peradeniya',
-            'University of Moratuwa',
-            'University of Kelaniya',
-            'University of Sri Jayewardenepura',
-            'University of Ruhuna',
-            'University of Jaffna',
-            'University of Sabaragamuwa',
-            'University of Wayamba',
-            'University of Uva Wellassa'
-        ]
+        # Extract universities from feature encoder (index 0 contains universities)
+        try:
+            available_universities = list(self.feature_encoder.categories_[0])
+            # Clean up university names (remove extra spaces and duplicates)
+            cleaned_universities = []
+            seen = set()
+            for uni in available_universities:
+                cleaned_uni = uni.strip()
+                if cleaned_uni and cleaned_uni not in seen:
+                    cleaned_universities.append(cleaned_uni)
+                    seen.add(cleaned_uni)
+            
+            if not cleaned_universities:
+                logger.warning("No universities found in feature encoder")
+                return []
+            
+        except Exception as e:
+            logger.error(f"Error extracting universities from feature encoder: {str(e)}")
+            return []
         
+        # Generate course-university pairs
         course_university_pairs = []
-        max_courses_per_stream = max(1, limit // len(default_universities))
+        max_courses_per_stream = max(1, limit // len(cleaned_universities))
         
         for course in courses[:max_courses_per_stream]:
-            for university in default_universities:
+            for university in cleaned_universities:
                 course_university_pairs.append({
                     'course_name': course,
                     'university_name': university
@@ -388,7 +590,7 @@ class MLPredictor:
             if len(course_university_pairs) >= limit:
                 break
         
-        logger.info(f"Generated {len(course_university_pairs)} course-university pairs for stream '{stream}'")
+        logger.info(f"Generated {len(course_university_pairs)} course-university pairs for stream '{stream}' using {len(cleaned_universities)} universities from pkl data")
         return course_university_pairs
     
     def get_model_info(self) -> Dict[str, Any]:
@@ -399,7 +601,6 @@ class MLPredictor:
             'classifier_available': self.classifier is not None,
             'classifier_encoder_available': self.classifier_encoder is not None,
             'feature_encoder_available': self.feature_encoder is not None,
-            'scaler_available': self.scaler is not None,
             'valid_courses_map_available': self.valid_courses_map is not None,
             'model_path': self.model_path,
             'regressor_features': getattr(self.regressor, 'n_features_in_', None) if self.regressor else None,
@@ -407,11 +608,33 @@ class MLPredictor:
             'available_streams': list(self.valid_courses_map.keys()) if self.valid_courses_map else []
         }
 
-# Create a single, globally-loaded instance of the predictor
-# This ensures models are loaded only once when the server starts.
+# Global instance and loading lock for thread-safe lazy loading
+_ml_predictor_instance = None
+_ml_predictor_lock = threading.Lock()
+
+def get_ml_predictor() -> MLPredictor:
+    """
+    Thread-safe singleton pattern for MLPredictor.
+    Creates the instance only when first requested.
+    """
+    global _ml_predictor_instance
+    
+    # First check (fast path) - no lock needed
+    if _ml_predictor_instance is not None:
+        return _ml_predictor_instance
+    
+    # Second check (slow path) - with lock
+    with _ml_predictor_lock:
+        if _ml_predictor_instance is None:
+            _ml_predictor_instance = MLPredictor()
+    
+    return _ml_predictor_instance
+
+# For backward compatibility
 try:
-    ml_predictor_instance = MLPredictor()
+    ml_predictor_instance = get_ml_predictor()
     logger.info("ML Predictor instance created successfully")
 except Exception as e:
     logger.error(f"Failed to create ML Predictor instance: {str(e)}")
+    _ml_predictor_instance = None
     ml_predictor_instance = None

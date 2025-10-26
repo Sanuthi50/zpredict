@@ -1,0 +1,1366 @@
+{% load static %}
+<!DOCTYPE html>
+<!-- WEBSITE HOME TEMPLATE -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zpredict Website - Your Academic Journey Starts Here</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="{% static 'css/indexstyle.css' %}" rel="stylesheet">
+  <style>
+    /* Game-inspired styles */
+    :root {
+      --neon-blue: #00f3ff;
+      --neon-pink: #ff00ff;
+      --neon-green: #39ff14;
+      --neon-yellow: #ffff00;
+      --dark-bg: #0a1a3b; /* Changed to dark blue */
+      --darker-bg: #050b1f; /* Darker blue for gradient */
+      --card-bg: rgba(16, 18, 37, 0.8);
+    }
+    
+    body {
+      background: linear-gradient(135deg, var(--darker-bg) 0%, var(--dark-bg) 70%);
+      color: white;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      background-attachment: fixed;
+    }
+    
+    /* Pixelated elements */
+    .pixel-border {
+      border: 4px solid var(--neon-blue);
+      box-shadow: 0 0 10px var(--neon-blue), inset 0 0 10px rgba(0, 243, 255, 0.2);
+      position: relative;
+    }
+    
+    .pixel-border::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      right: 2px;
+      bottom: 2px;
+      border: 2px solid var(--neon-pink);
+      pointer-events: none;
+    }
+    
+    /* 8-bit inspired text */
+    .bit-text {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1.2rem;
+      text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+      letter-spacing: 1px;
+    }
+    
+    .bit-text-sm {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.7rem;
+      text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+    }
+    
+    /* Futuristic text */
+    .futuristic-text {
+      font-family: 'Orbitron', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    
+    /* Navigation styles removed - using gamified-navbar.html component */
+    
+    /* Hero section */
+    .hero {
+      text-align: center;
+      padding: 100px 20px 60px;
+      position: relative;
+      z-index: 10;
+      background: linear-gradient(135deg, rgba(0, 243, 255, 0.1) 0%, rgba(255, 0, 255, 0.1) 50%, rgba(57, 255, 20, 0.1) 100%);
+      overflow: hidden;
+    }
+    
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%2300f3ff" stroke-width="0.5" opacity="0.3"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      opacity: 0.3;
+      z-index: -1;
+    }
+    
+    .hero-content h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 4rem;
+      margin-bottom: 30px;
+      background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink), var(--neon-green));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 20px rgba(0, 243, 255, 0.8);
+      animation: glow 3s ease-in-out infinite alternate;
+      position: relative;
+    }
+    
+    .hero-content h1::after {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink), var(--neon-green));
+      opacity: 0.2;
+      filter: blur(20px);
+      z-index: -1;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.2; }
+      50% { transform: scale(1.05); opacity: 0.4; }
+    }
+    
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
+      }
+      to {
+        text-shadow: 0 0 15px var(--neon-pink), 0 0 30px var(--neon-pink), 0 0 40px var(--neon-pink);
+      }
+    }
+    
+    .hero-subtitle {
+      font-size: 1.4rem;
+      max-width: 800px;
+      margin: 0 auto 50px;
+      color: #e0e0e0;
+      line-height: 1.6;
+      font-weight: 300;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin: 40px 0;
+      flex-wrap: wrap;
+    }
+    
+    .stat-item {
+      text-align: center;
+      padding: 20px;
+      background: rgba(0, 243, 255, 0.1);
+      border-radius: 10px;
+      border: 1px solid var(--neon-blue);
+      min-width: 120px;
+    }
+    
+    .stat-number {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--neon-yellow);
+      display: block;
+    }
+    
+    .stat-label {
+      font-size: 0.9rem;
+      color: #ccc;
+      margin-top: 5px;
+    }
+    
+    /* Features section */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+      margin: 60px auto;
+      max-width: 1200px;
+      padding: 0 20px;
+      justify-items: center;
+    }
+    
+    .feature-card {
+      background: var(--card-bg);
+      border-radius: 15px;
+      padding: 30px;
+      width: 100%;
+      max-width: 350px;
+      min-height: 400px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink), var(--neon-green));
+      z-index: -1;
+      border-radius: inherit;
+      animation: border-flow 3s linear infinite;
+    }
+    
+    @keyframes border-flow {
+      0% {
+        filter: hue-rotate(0deg);
+      }
+      100% {
+        filter: hue-rotate(360deg);
+      }
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-15px) scale(1.05);
+      box-shadow: 0 20px 40px rgba(0, 243, 255, 0.4);
+    }
+    
+    .feature-card:nth-child(1):hover {
+      box-shadow: 0 20px 40px rgba(0, 243, 255, 0.4);
+    }
+    
+    .feature-card:nth-child(2):hover {
+      box-shadow: 0 20px 40px rgba(255, 0, 255, 0.4);
+    }
+    
+    .feature-card:nth-child(3):hover {
+      box-shadow: 0 20px 40px rgba(57, 255, 20, 0.4);
+    }
+    
+    .feature-card h3 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--neon-yellow);
+      margin-bottom: 20px;
+      font-size: 1.6rem;
+      font-weight: 600;
+      text-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+    }
+    
+    .feature-card p {
+      color: #ddd;
+      margin-bottom: 25px;
+      line-height: 1.6;
+      font-size: 1rem;
+      flex-grow: 1;
+    }
+    
+    .image-placeholder {
+      margin: 20px 0;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.3);
+    }
+    
+    .image-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    
+    .feature-card:hover .image-placeholder img {
+      transform: scale(1.1);
+    }
+    
+    /* CTA section */
+    .cta-section {
+      margin: 50px 0;
+    }
+    
+    .cta-button {
+      background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink));
+      border: none;
+      padding: 15px 40px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border-radius: 50px;
+      color: white;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      transition: all 0.3s;
+      font-family: 'Orbitron', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .cta-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, var(--neon-green), var(--neon-yellow));
+      transition: all 0.6s;
+      z-index: -1;
+    }
+    
+    .cta-button:hover::before {
+      left: 0;
+    }
+    
+    .cta-button:hover {
+      box-shadow: 0 0 25px rgba(0, 243, 255, 0.7);
+      transform: translateY(-3px);
+    }
+    
+    /* About section */
+    .about-section {
+      padding: 80px 20px;
+      background: rgba(5, 5, 16, 0.7);
+      position: relative;
+      z-index: 10;
+      text-align: center;
+    }
+    
+    .about-section h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.5rem;
+      color: var(--neon-green);
+      margin-bottom: 40px;
+    }
+    
+    .about-section p {
+      max-width: 800px;
+      margin: 0 auto 20px;
+      line-height: 1.6;
+      color: #ccc;
+    }
+    
+    /* Feedback section */
+    .feedback-section {
+      padding: 100px 20px 60px;
+      text-align: center;
+      position: relative;
+      z-index: 10;
+      background: linear-gradient(135deg, rgba(255, 0, 255, 0.1) 0%, rgba(0, 243, 255, 0.1) 50%, rgba(255, 255, 0, 0.1) 100%);
+      overflow: hidden;
+    }
+    
+    .feedback-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="feedback-grid" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M 8 0 L 0 0 0 8" fill="none" stroke="%23ff00ff" stroke-width="0.4" opacity="0.2"/></pattern></defs><rect width="100" height="100" fill="url(%23feedback-grid)"/></svg>');
+      opacity: 0.4;
+      z-index: -1;
+    }
+    
+    .feedback-section h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 3.5rem;
+      margin-bottom: 30px;
+      background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue), var(--neon-yellow));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
+      animation: glow 3s ease-in-out infinite alternate;
+      position: relative;
+    }
+    
+    .feedback-section h2::after {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue), var(--neon-yellow));
+      opacity: 0.2;
+      filter: blur(20px);
+      z-index: -1;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .feedback-section p {
+      font-size: 1.3rem;
+      max-width: 700px;
+      margin: 0 auto 50px;
+      color: #e0e0e0;
+      line-height: 1.6;
+      font-weight: 300;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    
+    .feedback-stats {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin: 40px 0;
+      flex-wrap: wrap;
+    }
+    
+    .feedback-stat-item {
+      text-align: center;
+      padding: 15px 20px;
+      background: rgba(255, 0, 255, 0.1);
+      border-radius: 10px;
+      border: 1px solid var(--neon-pink);
+      min-width: 100px;
+    }
+    
+    .feedback-stat-number {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--neon-yellow);
+      display: block;
+    }
+    
+    .feedback-stat-label {
+      font-size: 0.8rem;
+      color: #ccc;
+      margin-top: 5px;
+    }
+    
+    #feedbackForm {
+      max-width: 600px;
+      margin: 0 auto 50px;
+      text-align: left;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--neon-blue);
+      font-weight: 500;
+    }
+    
+    #feedbackText, #rating {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--neon-blue);
+      color: white;
+      font-family: 'Inter', sans-serif;
+    }
+    
+    #feedbackText:focus, #rating:focus {
+      outline: none;
+      box-shadow: 0 0 10px var(--neon-blue);
+    }
+    
+    .recent-feedbacks {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .recent-title {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--neon-yellow);
+      margin-bottom: 20px;
+    }
+    
+    .feedback-item {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      text-align: left;
+      border-left: 4px solid var(--neon-green);
+    }
+    
+    .feedback-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .feedback-rating {
+      color: var(--neon-yellow);
+    }
+    
+    .feedback-date {
+      color: #999;
+    }
+    
+    .feedback-text {
+      color: #ccc;
+    }
+    
+    .empty-state {
+      color: #666;
+      font-style: italic;
+      text-align: center;
+      padding: 30px;
+    }
+    
+    /* Game UI elements */
+    .game-ui-corner {
+      position: fixed;
+      width: 150px;
+      height: 150px;
+      z-index: 5;
+      pointer-events: none;
+    }
+    
+    .corner-top-left {
+      top: 0;
+      left: 0;
+      border-top: 4px solid var(--neon-blue);
+      border-left: 4px solid var(--neon-blue);
+    }
+    
+    .corner-top-right {
+      top: 0;
+      right: 0;
+      border-top: 4px solid var(--neon-pink);
+      border-right: 4px solid var(--neon-pink);
+    }
+    
+    .corner-bottom-left {
+      bottom: 0;
+      left: 0;
+      border-bottom: 4px solid var(--neon-green);
+      border-left: 4px solid var(--neon-green);
+    }
+    
+    .corner-bottom-right {
+      bottom: 0;
+      right: 0;
+      border-bottom: 4px solid var(--neon-yellow);
+      border-right: 4px solid var(--neon-yellow);
+    }
+    
+    /* Floating elements */
+    .floating-icon {
+      position: absolute;
+      z-index: 2;
+      opacity: 0.7;
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0% {
+        transform: translateY(0) rotate(0deg);
+      }
+      50% {
+        transform: translateY(-20px) rotate(10deg);
+      }
+      100% {
+        transform: translateY(0) rotate(0deg);
+      }
+    }
+    
+    .icon-1 {
+      top: 20%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+    
+    .icon-2 {
+      top: 60%;
+      right: 15%;
+      animation-delay: 1s;
+    }
+    
+    .icon-3 {
+      bottom: 20%;
+      left: 20%;
+      animation-delay: 2s;
+    }
+    
+    .icon-4 {
+      top: 30%;
+      right: 25%;
+      animation-delay: 3s;
+    }
+    
+    /* Progress bar */
+    .progress-bar {
+      height: 5px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1001;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+      transition: width 0.3s ease;
+    }
+    
+    /* Retro scanlines effect */
+    .scanlines {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.03) 50%,
+        rgba(0, 0, 0, 0.1) 50%
+      );
+      background-size: 100% 4px;
+      z-index: 99;
+      pointer-events: none;
+      opacity: 0.2;
+    }
+    
+    /* Pixelated cursor */
+    body {
+      cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><rect x='0' y='0' width='4' height='4' fill='%2300f3ff'/><rect x='4' y='4' width='4' height='4' fill='%2300f3ff'/><rect x='8' y='8' width='4' height='4' fill='%2300f3ff'/><rect x='12' y='12' width='4' height='4' fill='%2300f3ff'/></svg>") 8 8, auto;
+    }
+    
+    a, button, .feature-card {
+      cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><rect x='0' y='0' width='16' height='16' fill='%23ff00ff'/><rect x='2' y='2' width='12' height='12' fill='%23000'/><rect x='4' y='4' width='8' height='8' fill='%23ff00ff'/></svg>") 8 8, pointer;
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .hero-content h1 {
+        font-size: 2.5rem;
+      }
+      
+      .features {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      
+      .feature-card {
+        max-width: 100%;
+      }
+      
+      .floating-icon {
+        display: none;
+      }
+      
+      .hero-stats {
+        gap: 20px;
+      }
+      
+      .stat-item {
+        min-width: 100px;
+        padding: 15px;
+      }
+      
+      .feedback-stats {
+        gap: 20px;
+      }
+      
+      .feedback-stat-item {
+        min-width: 80px;
+        padding: 12px 15px;
+      }
+    }
+
+    /* Mini-game styles */
+    .game-section {
+      padding: 80px 20px;
+      background: rgba(5, 5, 16, 0.7);
+      position: relative;
+      z-index: 10;
+      text-align: center;
+    }
+
+    .game-section h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.5rem;
+      color: var(--neon-yellow);
+      margin-bottom: 40px;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    .game-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 10px;
+      padding: 20px;
+      border: 2px solid var(--neon-green);
+      box-shadow: 0 0 20px var(--neon-green);
+      position: relative;
+    }
+
+    .game-canvas {
+      width: 100%;
+      max-width: 560px;
+      height: 200px;
+      background: var(--darker-bg); /* Match dark blue background */
+      border: 2px solid var(--neon-blue);
+      border-radius: 5px;
+      display: block;
+      margin: 0 auto 20px;
+    }
+
+    .game-instructions {
+      font-size: 1rem;
+      color: #ccc;
+      margin-bottom: 20px;
+    }
+
+    .game-score {
+      font-family: 'Press Start 2P', cursive;
+      color: var(--neon-yellow);
+      margin-bottom: 20px;
+    }
+
+    .game-button {
+      background: linear-gradient(45deg, var(--neon-green), var(--neon-yellow));
+      border: none;
+      padding: 10px 20px;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+      font-family: 'Orbitron', sans-serif;
+      text-transform: uppercase;
+      transition: all 0.3s;
+    }
+
+    .game-button:hover {
+      box-shadow: 0 0 15px var(--neon-green);
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+      .game-canvas {
+        height: 150px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Progress bar -->
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+  
+  <!-- Retro scanlines effect -->
+  <div class="scanlines"></div>
+  
+  <!-- Game UI corners -->
+  <div class="game-ui-corner corner-top-left"></div>
+  <div class="game-ui-corner corner-top-right"></div>
+  <div class="game-ui-corner corner-bottom-left"></div>
+  <div class="game-ui-corner corner-bottom-right"></div>
+  
+  <!-- Floating icons -->
+  <div class="floating-icon icon-1">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#00f3ff" stroke-width="2"/>
+      <path d="M2 17L12 22L22 17" stroke="#00f3ff" stroke-width="2"/>
+      <path d="M2 12L12 17L22 12" stroke="#00f3ff" stroke-width="2"/>
+    </svg>
+  </div>
+  
+  <div class="floating-icon icon-2">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 11C13.1046 11 14 10.1046 14 9C14 7.89543 13.1046 7 12 7C10.8954 7 10 7.89543 10 9C10 10.1046 10.8954 11 12 11Z" stroke="#ff00ff" stroke-width="2"/>
+      <path d="M17 5H7C5.89543 5 5 5.89543 5 7V17C5 18.1046 5.89543 19 7 19H17C18.1046 19 19 18.1046 19 17V7C19 5.89543 18.1046 5 17 5Z" stroke="#ff00ff" stroke-width="2"/>
+      <path d="M14 15H10V19H14V15Z" stroke="#ff00ff" stroke-width="2"/>
+    </svg>
+  </div>
+  
+  <div class="floating-icon icon-3">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#39ff14" stroke-width="2"/>
+      <path d="M12 6V12L16 14" stroke="#39ff14" stroke-width="2"/>
+    </svg>
+  </div>
+  
+  <div class="floating-icon icon-4">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="#ffff00" stroke-width="2"/>
+    </svg>
+  </div>
+
+  <!-- Animated background particles -->
+  <div class="bg-particles" id="particles"></div>
+  
+  <!-- Include Gamified Navbar Component -->
+  {% include 'gamified-navbar.html' %}
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>YOUR ACADEMIC JOURNEY BEGINS</h1>
+      <p class="hero-subtitle">
+        🚀 Level up your future with AI-powered university predictions, career guidance, and personalized academic insights. Join thousands of Sri Lankan students who've unlocked their potential with ZPredict!
+      </p>
+      
+      <!-- Hero Stats -->
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-number">100%</span>
+          <span class="stat-label">Free</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">87%</span>
+          <span class="stat-label">Accuracy Rate</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">18+</span>
+          <span class="stat-label">All-State-Universities</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">24/7</span>
+          <span class="stat-label">AI Support</span>
+        </div>
+      </div>
+      
+      <!-- Image placeholder for hero section -->
+      <div class="image-placeholder pixel-border">
+       <img src="{% static 'images/grad.jpg' %}" alt="Hero Illustration"/>
+      </div>
+    </div>
+    <div class="features">
+      <div class="feature-card" onclick="navigateTo('http://127.0.0.1:8000/website/predict/')">
+        <h3>UNIVERSITY PREDICTOR</h3>
+        <p>Get personalized university recommendations based on your academic performance and preferences.</p>
+        
+        <!-- Image placeholder for feature -->
+        <div class="image-placeholder">
+          <img src="{% static 'images/university.png' %}" alt="University Illustration"/>
+        </div>
+        <div class="bit-text-sm">CLICK TO EXPLORE →</div>
+      </div>
+      <div class="feature-card" onclick="navigateTo('http://127.0.0.1:8000/website/chat/')">
+        <h3>AI CHATBOT</h3>
+        <p>Ask questions about universities, courses, and admission requirements through our intelligent assistant.</p>
+        
+        <!-- Image placeholder for feature -->
+        <div class="image-placeholder">
+          <img src="{% static 'images/chatbot.png' %}" alt="Chatbot Illustration"/>
+        </div>
+        <div class="bit-text-sm">CLICK TO CHAT →</div>
+      </div>
+      <div class="feature-card" onclick="navigateTo('http://127.0.0.1:8000/website/recommendation/')">
+        <h3>CAREER PREDICTOR</h3>
+        <p>Get a career prediction based on your academic performance and preferences.</p>
+        
+        <!-- Image placeholder for feature -->
+        <div class="image-placeholder">
+         <img src="{% static 'images/career.png' %}" alt="Career Illustration"/>
+        </div>
+        <div class="bit-text-sm">CLICK TO DISCOVER →</div>
+      </div>
+    </div>
+    <div class="cta-section">
+      <button class="cta-button" onclick="navigateTo('http://127.0.0.1:8000/chat/')">START YOUR QUEST</button>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="about-section">
+    <div class="container">
+      <h2>ABOUT ZPREDICT</h2>
+      
+      <!-- Image placeholder for about section -->
+      <div class="image-placeholder pixel-border">
+        <img src="{% static 'images/aboutus.avif' %}" alt="About Illustration"/>
+      </div>
+      
+      <p>
+        Zpredict is your personalized academic guide, built for Sri Lankan students.  
+        We combine AI, machine learning, and official UGC datasets to help you make smarter choices  
+        about your university and career path. From predicting cutoff marks to suggesting careers aligned  
+        with your strengths, we are here to make your higher education journey less stressful and more empowering.
+      </p>     
+      <p>
+        Whether you are unsure about which university program suits you best or need clarity on aptitude tests,  
+        our platform provides insights, recommendations, and chatbot support. We  
+        built Zpredict to give you the tools we wish we had.
+      </p>
+      
+      <div class="bit-text" style="margin-top: 40px;">MISSION: UNLOCK YOUR POTENTIAL</div>
+    </div>
+  </section>
+
+  <!-- Feedback Section -->
+  <section id="feedback" class="feedback-section">
+    <div class="container">
+      <h2>WE VALUE YOUR FEEDBACK</h2>
+      <p>🎯 Help us level up by sharing your experience with ZPredict! Your insights power our AI to serve students better across Sri Lanka.</p>
+      <form id="feedbackForm" class="pixel-border" style="padding: 20px;">
+        <div class="form-group">
+          <label for="feedbackText">YOUR MESSAGE</label>
+          <textarea id="feedbackText" name="feedback" rows="4" placeholder="Type your thoughts here..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="rating">RATE OUR SERVICE</label>
+          <select id="rating" name="rating">
+            <option value="5">★★★★★ - Excellent</option>
+            <option value="4">★★★★ - Good</option>
+            <option value="3">★★★ - Average</option>
+            <option value="2">★★ - Poor</option>
+            <option value="1">★ - Very Poor</option>
+          </select>
+        </div>
+
+        <button type="submit" class="cta-button">SUBMIT FEEDBACK</button>
+      </form>
+
+      <div class="recent-feedbacks" id="recentFeedbacksWrapper">
+        <h3 class="recent-title">PLAYER REVIEWS</h3>
+        <div id="recentFeedbacks">
+          <div class="empty-state">No feedbacks yet. Be the first to share!</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Asteroid Dodge Game Section -->
+  <section id="mini-game" class="game-section">
+    <div class="container">
+      <h2>ASTEROID DODGE CHALLENGE</h2>
+      <p class="hero-subtitle">Navigate your spaceship through the asteroid field! Click to jump and avoid collisions.</p>
+      <div class="game-container">
+        <canvas id="gameCanvas" class="game-canvas" width="560" height="200"></canvas>
+        <p class="game-instructions">Click on the box to jump. Avoid the asteroids!</p>
+        <div class="game-score" id="gameScore">Score: 0</div>
+        <button id="startGame" class="game-button">Start Mission</button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Index Page Manager
+    class IndexPageManager {
+        constructor() {
+            this.apiBaseUrl = 'http://127.0.0.1:8000/api/';
+            this.token = localStorage.getItem('access_token');
+            this.init();
+        }
+    
+        init() {
+            this.setupParticles();
+            // Navigation handled by gamified-navbar.html component
+            this.setupFeedbackSystem();
+            this.setupScrollProgress();
+            this.setupAnimations();
+            this.setupMiniGame();
+        }
+    
+        // Get authentication token
+        getAuthToken() {
+            return localStorage.getItem('access_token');
+        }
+    
+        // Setup particle background effect
+        setupParticles() {
+            const particles = document.getElementById('particles');
+            if (particles) {
+                for (let i = 0; i < 50; i++) {
+                    const particle = document.createElement('div');
+                    particle.style.position = 'absolute';
+                    particle.style.width = Math.random() * 5 + 2 + 'px';
+                    particle.style.height = particle.style.width;
+                    particle.style.background = i % 3 === 0 ? '#6C63FF' : i % 3 === 1 ? '#36D6C3' : '#FF6B8B';
+                    particle.style.borderRadius = '50%';
+                    particle.style.opacity = Math.random() * 0.5 + 0.1;
+                    particle.style.top = Math.random() * 100 + 'vh';
+                    particle.style.left = Math.random() * 100 + 'vw';
+                    
+                    particles.appendChild(particle);
+                    this.animateParticle(particle);
+                }
+            }
+        }
+    
+        animateParticle(particle) {
+            const duration = Math.random() * 10 + 10;
+            
+            particle.animate([
+                { transform: 'translateY(0px)', opacity: particle.style.opacity },
+                { transform: `translateY(${Math.random() * 100 - 50}px) translateX(${Math.random() * 100 - 50}px)`, opacity: Math.random() * 0.5 }
+            ], {
+                duration: duration * 1000,
+                iterations: Infinity,
+                direction: 'alternate',
+                easing: 'ease-in-out'
+            });
+        }
+    
+        // Navigation handled by gamified-navbar.html component
+        
+        // Setup scroll progress bar
+        setupScrollProgress() {
+            window.addEventListener('scroll', () => {
+                const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const scrolled = (winScroll / height) * 100;
+                document.getElementById('progressFill').style.width = scrolled + '%';
+            });
+        }
+        
+        // Setup animations
+        setupAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-in');
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            document.querySelectorAll('.feature-card, h2, .hero-content').forEach(el => {
+                observer.observe(el);
+            });
+        }
+    
+        // Setup feedback system
+        setupFeedbackSystem() {
+            const feedbackForm = document.getElementById('feedbackForm');
+            if (feedbackForm) {
+                feedbackForm.addEventListener('submit', (e) => this.submitFeedback(e));
+                this.loadFeedbacks();
+            }
+        }
+    
+        // Show alert messages
+        showAlert(message, type = 'success') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" onclick="this.parentElement.remove()">×</button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+    
+        // Load and display feedbacks
+        async loadFeedbacks() {
+            try {
+                const token = this.getAuthToken();
+                if (!token) {
+                    console.log('No auth token, showing empty state');
+                    this.displayFeedbacks([]);
+                    return;
+                }
+    
+                console.log('Loading feedbacks with token:', token ? 'present' : 'missing');
+                const response = await fetch(this.apiBaseUrl + 'feedback/', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                console.log('Feedback response status:', response.status);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Feedback data received:', data);
+                    console.log('Data keys:', Object.keys(data));
+                    console.log('Data type:', typeof data);
+                    
+                    let feedbacks = [];
+                    if (Array.isArray(data)) {
+                        feedbacks = data;
+                    } else if (data.feedbacks) {
+                        feedbacks = data.feedbacks;
+                    } else if (data.results) {
+                        feedbacks = data.results;
+                    } else if (data.data) {
+                        feedbacks = data.data;
+                    }
+                    
+                    console.log('Extracted feedbacks:', feedbacks);
+                    console.log('Feedbacks count:', feedbacks.length);
+                    this.displayFeedbacks(feedbacks);
+                } else {
+                    console.error('Failed to fetch feedbacks, status:', response.status);
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    this.displayFeedbacks([]);
+                }
+            } catch (error) {
+                console.error('Error fetching feedbacks:', error);
+                this.displayFeedbacks([]);
+            }
+        }
+    
+        // Display feedbacks in the UI
+        displayFeedbacks(feedbacks) {
+            const container = document.getElementById('recentFeedbacks');
+            if (!container) return;
+            
+            if (!feedbacks || feedbacks.length === 0) {
+                container.innerHTML = '<div class="empty-state">No feedbacks yet. Be the first to share!</div>';
+                return;
+            }
+            
+            const feedbacksHtml = feedbacks.slice(0, 5).map(feedback => {
+                const stars = '★'.repeat(feedback.rating || 0) + '☆'.repeat(5 - (feedback.rating || 0));
+                const date = new Date(feedback.submitted_at).toLocaleDateString();
+                return `
+                    <div class="feedback-item">
+                        <div class="feedback-header">
+                            <strong>${feedback.student_name || 'Anonymous'}</strong>
+                            <span class="feedback-rating">${stars}</span>
+                            <small class="feedback-date">${date}</small>
+                        </div>
+                        <p class="feedback-text">${feedback.feedback}</p>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = feedbacksHtml;
+        }
+    
+        // Submit feedback
+        async submitFeedback(event) {
+            event.preventDefault();
+            
+            const feedbackForm = document.getElementById('feedbackForm');
+            const formData = new FormData(feedbackForm);
+            const feedbackText = formData.get('feedback');
+            const rating = formData.get('rating');
+            
+            if (!feedbackText.trim()) {
+                this.showAlert('Please provide your feedback', 'error');
+                return;
+            }
+            
+            if (!rating) {
+                this.showAlert('Please select a rating', 'error');
+                return;
+            }
+            
+            try {
+                const token = this.getAuthToken();
+                if (!token) {
+                    this.showAlert('Please log in to submit feedback', 'error');
+                    return;
+                }
+    
+                const response = await fetch(this.apiBaseUrl + 'feedback/', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        feedback: feedbackText,
+                        rating: parseInt(rating)
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Failed to submit feedback');
+                }
+                
+                const newFeedback = await response.json();
+                this.showAlert('Thank you for your feedback!');
+                feedbackForm.reset();
+                
+                this.loadFeedbacks();
+            } catch (error) {
+                console.error('Error submitting feedback:', error);
+                this.showAlert(error.message || 'Failed to submit feedback. Please try again.', 'error');
+            }
+        }
+
+        // Setup mini-game (Asteroid Dodge)
+        setupMiniGame() {
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+            const startBtn = document.getElementById('startGame');
+            const scoreEl = document.getElementById('gameScore');
+            
+            // Debug logging
+            console.log('Setting up mini-game...');
+            console.log('Canvas:', canvas);
+            console.log('Context:', ctx);
+            console.log('Start button:', startBtn);
+            console.log('Score element:', scoreEl);
+            
+            if (!canvas || !ctx || !startBtn || !scoreEl) {
+                console.error('Mini-game elements not found!');
+                return;
+            }
+            
+            // Ensure canvas dimensions are set
+            canvas.width = 560;
+            canvas.height = 200;
+            
+            // Draw initial background to test canvas
+            ctx.fillStyle = '#050b1f';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00f3ff';
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Click "Start Mission" to begin!', canvas.width / 2, canvas.height / 2);
+
+            let gameState = {
+                player: { x: 50, y: canvas.height - 30, width: 20, height: 20, dy: 0, gravity: 0.5, jumpPower: -10 },
+                obstacles: [],
+                score: 0,
+                gameOver: false,
+                gameStarted: false,
+                frame: 0
+            };
+
+            const drawPlayer = () => {
+                ctx.fillStyle = '#00f3ff'; // neon-blue
+                ctx.fillRect(gameState.player.x, gameState.player.y, gameState.player.width, gameState.player.height);
+                ctx.strokeStyle = '#ff00ff'; // neon-pink
+                ctx.lineWidth = 2;
+                ctx.strokeRect(gameState.player.x, gameState.player.y, gameState.player.width, gameState.player.height);
+            };
+
+            const drawObstacles = () => {
+                ctx.fillStyle = '#ffff00'; // neon-yellow
+                gameState.obstacles.forEach(obstacle => {
+                    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                    ctx.strokeStyle = '#39ff14'; // neon-green
+                    ctx.strokeRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                });
+            };
+
+            const updateGame = () => {
+                if (!gameState.gameStarted || gameState.gameOver) {
+                    if (gameState.gameOver) {
+                        ctx.fillStyle = '#ff00ff'; // neon-pink
+                        ctx.font = '20px "Press Start 2P"';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('Game Over!', canvas.width / 2, canvas.height / 2);
+                    }
+                    return;
+                }
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw background
+                ctx.fillStyle = '#050b1f'; // darker-bg
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Update player
+                gameState.player.dy += gameState.player.gravity;
+                gameState.player.y += gameState.player.dy;
+                if (gameState.player.y > canvas.height - gameState.player.height) {
+                    gameState.player.y = canvas.height - gameState.player.height;
+                    gameState.player.dy = 0;
+                }
+                if (gameState.player.y < 0) {
+                    gameState.player.y = 0;
+                    gameState.player.dy = 0;
+                }
+
+                // Spawn obstacles
+                if (gameState.frame % 60 === 0) {
+                    gameState.obstacles.push({
+                        x: canvas.width,
+                        y: canvas.height - 20,
+                        width: 20,
+                        height: 20,
+                        speed: 3
+                    });
+                }
+
+                // Update obstacles
+                gameState.obstacles = gameState.obstacles.filter(obstacle => obstacle.x > -obstacle.width);
+                gameState.obstacles.forEach(obstacle => {
+                    obstacle.x -= obstacle.speed;
+                });
+
+                // Collision detection
+                gameState.obstacles.forEach(obstacle => {
+                    if (
+                        gameState.player.x < obstacle.x + obstacle.width &&
+                        gameState.player.x + gameState.player.width > obstacle.x &&
+                        gameState.player.y < obstacle.y + obstacle.height &&
+                        gameState.player.y + gameState.player.height > obstacle.y
+                    ) {
+                        gameState.gameOver = true;
+                        startBtn.innerHTML = 'Restart Mission';
+                        startBtn.style.display = 'block';
+                    }
+                });
+
+                // Draw elements
+                drawPlayer();
+                drawObstacles();
+
+                // Update score
+                gameState.score += 0.1;
+                scoreEl.innerHTML = `Score: ${Math.floor(gameState.score)}`;
+
+                gameState.frame++;
+                requestAnimationFrame(updateGame);
+            };
+
+            canvas.addEventListener('click', () => {
+                if (gameState.gameStarted && !gameState.gameOver) {
+                    gameState.player.dy = gameState.player.jumpPower;
+                }
+            });
+
+            startBtn.addEventListener('click', () => {
+                if (!gameState.gameStarted || gameState.gameOver) {
+                    gameState = {
+                        player: { x: 50, y: canvas.height - 30, width: 20, height: 20, dy: 0, gravity: 0.5, jumpPower: -10 },
+                        obstacles: [],
+                        score: 0,
+                        gameOver: false,
+                        gameStarted: true,
+                        frame: 0
+                    };
+                    startBtn.style.display = 'none';
+                    updateGame();
+                }
+            });
+        }
+    }
+    
+    // Global navigation function
+    function navigateTo(url) {
+        window.location.href = url;
+    }
+    
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        new IndexPageManager();
+    });
+  </script>
+</body>
+</html>

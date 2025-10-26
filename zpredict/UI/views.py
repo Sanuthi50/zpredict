@@ -14,37 +14,21 @@ import logging
 # Set up logging
 logger = logging.getLogger(__name__)
 
-class LoginView(TemplateView):
-    template_name = 'login.html'
-
-class RegisterView(View):
-    def get(self, request):
-        return render(request, 'register.html')
-
-class HomeView(View):
-    def get(self, request):
-        return render(request, 'home.html')
-
-class ChatView(View):
-    def get(self, request):
-        return render(request, 'chatbot.html')
 
 class AdminView(View):
     def get(self, request):
         return render(request, 'admin-dashboard.html')
+class AdminAnalyticsView(View):
+    def get(self, request):
+        return render(request, 'dashboard.html')
 
 class AdminRegisterView(View):
     def get(self, request):
         return render(request, 'admin-register.html')
-
 class AdminReprocessView(View):
     def get(self, request):
         logger.info("=== AdminReprocessView: Starting token validation ===")
         
-        # Since frontend stores tokens in localStorage and sends via Authorization header,
-        # we need to handle both cases: direct access and API access
-        
-        # Check for token in Authorization header (from AJAX requests)
         auth_header = request.META.get('HTTP_AUTHORIZATION')
         logger.info(f"Authorization header: {auth_header}")
         
@@ -130,8 +114,23 @@ class AdminReprocessView(View):
             import traceback
             logger.error(f"Full traceback: {traceback.format_exc()}")
             return redirect('admin-dashboard')
-class PredictionView(View):
+class FeedbackManagementView(View):
     def get(self, request):
-        return render(request, 'prediction.html')
+        return render(request, 'feedback-management.html')
+
+class AdminProfileView(View):
+    def get(self, request):
+        return render(request, 'adminprofile.html')
+
+class AdminLoginView(View):
+    def get(self, request):
+        return render(request, 'admin-login.html')
+
+class HomeView(View):
+    def get(self, request):
+        return render(request, 'home.html')
+
+
+
 
 
