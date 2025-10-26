@@ -235,7 +235,7 @@ uploads/
 api/ml_model/*.pkl
 
 # Django settings (do not commit sensitive config)
-**/settings.py
+**/settings.py 
 **/settings_local.py
 **/settings_dev.py
 **/settings_prod.py
