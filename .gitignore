@@ -242,3 +242,8 @@ api/ml_model/*.pkl
 
 # Optional: if using config folders for environment-based settings
 config/
+# Ignore ML model files
+zpredict/api/ml_model/*.pkl
+zpredict/media/ugc_pdfs/vectorstores/*.pkl
+temp_models/
+
